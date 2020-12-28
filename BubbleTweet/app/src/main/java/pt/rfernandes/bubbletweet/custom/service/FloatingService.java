@@ -173,7 +173,7 @@ public class FloatingService extends Service implements View.OnClickListener,
             new Handler(getMainLooper()).post(new Runnable() {
               @Override
               public void run() {
-                showMessage("Tweet successfully sent.");
+                showMessage(getString(R.string.tweet_success));
               }
             });
           }
@@ -202,7 +202,9 @@ public class FloatingService extends Service implements View.OnClickListener,
 
   // Shows message to the user...
   void showMessage(String message) {
-
+    UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, false);
+    editTextTextRight.setText("");
+    editTextTextLeft.setText("");
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
   }

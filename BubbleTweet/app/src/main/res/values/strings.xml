@@ -5,7 +5,7 @@
 
   <string name="empty_tweet">Can\'t send an empty tweet.</string>
   <string name="send">Send</string>
-  <string name="send">Send</string>
   <string name="write_your_tweet">Write your tweet</string>
-  <string name="tweet_something">Tweet something...</string>
+  <string name="tweet_something">Tweet something…</string>
+  <string name="tweet_success">Tweet successfully sent.</string>
 </resources>
