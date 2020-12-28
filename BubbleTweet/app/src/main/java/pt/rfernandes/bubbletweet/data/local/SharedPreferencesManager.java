@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
+import com.twitter.sdk.android.core.TwitterSession;
 
 import pt.rfernandes.bubbletweet.model.CustomUser;
 
@@ -33,11 +34,9 @@ public class SharedPreferencesManager {
     }
   }
 
-  public void setUserLoggedIn(FirebaseUser firebaseUser){
-    CustomUser customUser = new CustomUser("", firebaseUser.getDisplayName(),
-        firebaseUser.getEmail(), firebaseUser.getPhotoUrl(), "", firebaseUser.getUid(),
-        firebaseUser.getProviderId())
-    String user = new Gson().toJson(firebaseUser);
+  public void setUserLoggedIn(CustomUser customUser){
+
+    String user = new Gson().toJson(customUser);
 
     if (sharedPrefs == null || sharedPrefsEditor == null) {
       sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
@@ -52,7 +51,8 @@ public class SharedPreferencesManager {
     if (sharedPrefs == null) {
       sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
-    return new Gson().fromJson(sharedPrefs.getString(USER_KEY, ""), CustomUser.class);
+    String user = sharedPrefs.getString(USER_KEY, "");
+    return new Gson().fromJson(user, CustomUser.class);
   }
 
 }

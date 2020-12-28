@@ -1,11 +1,10 @@
 package pt.rfernandes.bubbletweet.custom.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.view.Display;
 import android.view.Gravity;
@@ -14,18 +13,28 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import androidx.annotation.Nullable;
 import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
+import pt.rfernandes.bubbletweet.data.Repository;
+import pt.rfernandes.bubbletweet.data.local.DBCallBack;
+import pt.rfernandes.bubbletweet.data.remote.RequestCallBack;
+import pt.rfernandes.bubbletweet.model.CustomUser;
+import pt.rfernandes.bubbletweet.model.TweetBody;
 
-public class FloatingService extends Service implements View.OnClickListener, View.OnTouchListener {
+public class FloatingService extends Service implements View.OnClickListener,
+    View.OnTouchListener, View.OnFocusChangeListener {
   private static final int MAX_CLICK_DURATION = 200;
   private static final int MAX_CLICK_DISTANCE = 15;
+  private Repository mRepository;
   private UtilsClass.SIDE mSIDE = UtilsClass.SIDE.RIGHT;
   private long startClickTime;
   private WindowManager mWindowManager;
@@ -33,11 +42,13 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
   private ImageView mainButton;
   private LinearLayout showLinLeft;
   private LinearLayout showLinRight;
-  private Button button;
+  private EditText editTextTextRight;
+  private EditText editTextTextLeft;
+  private Button buttonLeft;
+  private Button buttonRight;
   private RelativeLayout r1;
   private WindowManager.LayoutParams params;
   private int width = 0;
-
   int initialX = 0;
   int initialY = 0;
   float initialTouchX = 0;
@@ -52,8 +63,8 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
   @Override
   public void onCreate() {
     super.onCreate();
-    WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-    Display display = window.getDefaultDisplay();
+    mRepository = Repository.getInstance(getApplication());
+    Display display = getDisplay();
     Point size = new Point();
     display.getSize(size);
     width = size.x;
@@ -62,25 +73,40 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
     //Inflate the floating view layout we created
     mFloatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
     r1 = mFloatingView.findViewById(R.id.r1);
-    //Add the view to the window.
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      params = new WindowManager.LayoutParams(
-          WindowManager.LayoutParams.WRAP_CONTENT,
-          WindowManager.LayoutParams.WRAP_CONTENT,
-          WindowManager.LayoutParams.TYPE_PHONE,
-          WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-          PixelFormat.TRANSLUCENT);
+    //Add the view to the window
+    mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+    mWindowManager.addView(mFloatingView, getParams());
 
+    mainButton = (ImageView) mFloatingView.findViewById(R.id.mainButton);
+    buttonLeft = (Button) mFloatingView.findViewById(R.id.buttonLeft);
+    buttonRight = (Button) mFloatingView.findViewById(R.id.buttonRight);
+    showLinLeft = (LinearLayout) mFloatingView.findViewById(R.id.showLinLeft);
+    showLinRight = (LinearLayout) mFloatingView.findViewById(R.id.showLinRight);
+    editTextTextRight = (EditText) mFloatingView.findViewById(R.id.editTextTextRight);
+    editTextTextLeft = (EditText) mFloatingView.findViewById(R.id.editTextTextLeft);
 
-    } else {
-      params = new WindowManager.LayoutParams(
-          WindowManager.LayoutParams.WRAP_CONTENT,
-          WindowManager.LayoutParams.WRAP_CONTENT,
-          WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-          WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-          PixelFormat.TRANSLUCENT);
-    }
+    editTextTextRight.setOnFocusChangeListener(this);
+    editTextTextLeft.setOnFocusChangeListener(this);
+
+    mainButton.setOnClickListener(this);
+    buttonLeft.setOnClickListener(this);
+    buttonRight.setOnClickListener(this);
+//    btnClose.setOnClickListener(this);
+
+    //Drag and move floating view using user's touch action.
+    mainButton.setOnTouchListener(this);
+  }
+
+  private WindowManager.LayoutParams getParams() {
+
+    params = new WindowManager.LayoutParams(
+        WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        PixelFormat.TRANSLUCENT);
+
     params.gravity = Gravity.START | Gravity.TOP;
 
     // Set the position to the top right corner of the screen
@@ -88,27 +114,13 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
     params.x = width - 50;
     params.y = 50;
 
-    //Add the view to the window
-    mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-    mWindowManager.addView(mFloatingView, params);
-
-    mainButton = (ImageView) mFloatingView.findViewById(R.id.mainButton);
-    button = (Button) mFloatingView.findViewById(R.id.buttonLeft);
-    showLinLeft = (LinearLayout) mFloatingView.findViewById(R.id.showLinLeft);
-    showLinRight = (LinearLayout) mFloatingView.findViewById(R.id.showLinRight);
-
-    mainButton.setOnClickListener(this);
-    button.setOnClickListener(this);
-//    btnClose.setOnClickListener(this);
-
-    //Drag and move floating view using user's touch action.
-    mainButton.setOnTouchListener(this);
+    return params;
   }
 
   @Override
   public void onClick(View view) {
     if (view == mainButton) {
-      switch (mSIDE){
+      switch (mSIDE) {
         case LEFT:
           showLinRight.setVisibility(View.GONE);
           showLinLeft.setVisibility(showLinLeft.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
@@ -120,17 +132,64 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
           break;
       }
 
-    }
+    } else if (view == buttonLeft || view == buttonRight) {
+      String tweetContent = "";
+      switch (mSIDE) {
+        case LEFT:
+          tweetContent = editTextTextLeft.getText().toString();
+          break;
+        case RIGHT:
+          tweetContent = editTextTextRight.getText().toString();
+          break;
+      }
 
-    if (view == button) {
-//      Intent intent = new Intent(FloatingService.this, MainActivity.class);
-//      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//      startActivity(intent);
-//
-//      // Stop the service and Remove the Floating Button when our app opens...
-//      stopSelf();
-      showMessage("Tweet sent");
+      if (tweetContent.isEmpty()) {
+
+        showMessage(getString(R.string.empty_tweet));
+
+      } else {
+        sendTweet(tweetContent);
+
+      }
+
     }
+  }
+
+  private void sendTweet(String status) {
+    String finalTweetContent = status;
+    mRepository.getUserLoggedIn(new DBCallBack<CustomUser>() {
+      @Override
+      public void returnDB(CustomUser object) {
+
+        TweetBody tweetBody =
+            new TweetBody(getResources().getString(R.string.twitter_consumer_key),
+                getResources().getString(R.string.twitter_consumer_secret),
+                object.getToken(), finalTweetContent, object.getUserSecret());
+
+        mRepository.sendTweet(tweetBody, new RequestCallBack() {
+          @Override
+          public void success() {
+            new Handler(getMainLooper()).post(new Runnable() {
+              @Override
+              public void run() {
+                showMessage("Tweet successfully sent.");
+              }
+            });
+          }
+
+          @Override
+          public void failure(String error) {
+//            looper.
+            new Handler(getMainLooper()).post(new Runnable() {
+              @Override
+              public void run() {
+                showMessage(error);
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   @Override
@@ -142,7 +201,9 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
 
   // Shows message to the user...
   void showMessage(String message) {
-    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
   }
 
   @Override
@@ -157,7 +218,6 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
 
         //get the touch location
         initialTouchX = view.getX() - motionEvent.getRawX();
-//        Toast.makeText(this, "X: " + view.getX() + " " + "Y: " + view.getY(), Toast.LENGTH_LONG).show();
         initialTouchY = view.getY() - motionEvent.getRawY();
         return true;
       case MotionEvent.ACTION_MOVE:
@@ -175,21 +235,21 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
           // Click event has occurred
           view.performClick();
         } else {
-          Toast.makeText(this, "x: " + params.x + " width/2: " + (width / 2),
-              Toast.LENGTH_SHORT).show();
 
           RelativeLayout.LayoutParams lp =
-              new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams)r1.getLayoutParams());
+              new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) r1.getLayoutParams());
           if (params.x < (width / 2)) {
             mSIDE = UtilsClass.SIDE.LEFT;
             params.x = 0;
             lp.removeRule(RelativeLayout.ALIGN_PARENT_END);
             lp.addRule(RelativeLayout.ALIGN_PARENT_START);
+            editTextTextLeft.requestFocus();
           } else if (params.x > (width / 2)) {
             params.x = width;
             mSIDE = UtilsClass.SIDE.RIGHT;
             lp.removeRule(RelativeLayout.ALIGN_PARENT_START);
             lp.addRule(RelativeLayout.ALIGN_PARENT_END);
+            editTextTextRight.requestFocus();
           }
           r1.setLayoutParams(lp);
 
@@ -201,15 +261,29 @@ public class FloatingService extends Service implements View.OnClickListener, Vi
     return false;
   }
 
-  private float distance(float x1, float y1, float x2, float y2) {
-    float dx = x1 - x2;
-    float dy = y1 - y2;
-    float distanceInPx = (float) Math.sqrt(dx * dx + dy * dy);
-    return pxToDp(distanceInPx);
+  @Override
+  public void onFocusChange(View v, boolean hasFocus) {
+    if (hasFocus) {
+      enableKeyboard();
+    } else {
+      disableKeyboard();
+    }
   }
 
-  private float pxToDp(float px) {
-    return px / getResources().getDisplayMetrics().density;
+  private void enableKeyboard() {
+
+    params.flags = 0;
+    mWindowManager.updateViewLayout(mFloatingView, params);
+    UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, true);
+
+  }
+
+  private void disableKeyboard() {
+
+    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+    mWindowManager.updateViewLayout(mFloatingView, params);
+    UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, false);
+
   }
 
 }

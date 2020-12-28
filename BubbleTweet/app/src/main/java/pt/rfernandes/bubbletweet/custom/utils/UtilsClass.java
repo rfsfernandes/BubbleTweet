@@ -1,10 +1,23 @@
 package pt.rfernandes.bubbletweet.custom.utils;
 
 import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.graphics.Color;
+import android.os.IBinder;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
+import java.util.Base64;
+
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class UtilsClass {
   public enum SIDE {
@@ -45,5 +58,58 @@ public class UtilsClass {
     }
     win.setAttributes(winParams);
   }
+
+  public void openKeyboard(Application application, View view, boolean show){
+    InputMethodManager inputMethodManager =
+        (InputMethodManager)application.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+    if(show) {
+      inputMethodManager.showSoftInputFromInputMethod(view.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED);
+    } else {
+      inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED);
+    }
+  }
+
+  public String computeSignature(String baseString, String keyString) throws GeneralSecurityException, UnsupportedEncodingException
+  {
+    SecretKey secretKey = null;
+
+    byte[] keyBytes = keyString.getBytes();
+    secretKey = new SecretKeySpec(keyBytes, "HmacSHA1");
+
+    Mac mac = Mac.getInstance("HmacSHA1");
+    mac.init(secretKey);
+
+    byte[] text = baseString.getBytes();
+
+    return new String(Base64.getEncoder().encode(mac.doFinal(text))).trim();
+  }
+
+  public String encode(String value)
+  {
+    String encoded = null;
+    try {
+      encoded = URLEncoder.encode(value, "UTF-8");
+    } catch (UnsupportedEncodingException ignore) {
+    }
+    StringBuilder buf = new StringBuilder(encoded.length());
+    char focus;
+    for (int i = 0; i < encoded.length(); i++) {
+      focus = encoded.charAt(i);
+      if (focus == '*') {
+        buf.append("%2A");
+      } else if (focus == '+') {
+        buf.append("%20");
+      } else if (focus == '%' && (i + 1) < encoded.length()
+          && encoded.charAt(i + 1) == '7' && encoded.charAt(i + 2) == 'E') {
+        buf.append('~');
+        i += 2;
+      } else {
+        buf.append(focus);
+      }
+    }
+    return buf.toString();
+  }
+
 
 }

@@ -2,27 +2,41 @@ package pt.rfernandes.bubbletweet.model;
 
 import android.net.Uri;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class CustomUser {
+  @PrimaryKey(autoGenerate = true)
+  private long id;
   private String userSecret;
   private String name;
   private String email;
-  private Uri photoUrl;
+  private String photoUrl;
   private String token;
   private String uid;
   private String providerId;
 
-
   public CustomUser() {
   }
 
-  public CustomUser(String userSecret, String name, String email, Uri photoUrl, String token, String uid, String providerId) {
+  public CustomUser(String userSecret, String name, String email, String photoUri, String token,
+                    String uid, String providerId) {
     this.userSecret = userSecret;
     this.name = name;
     this.email = email;
-    this.photoUrl = photoUrl;
+    this.photoUrl = photoUri;
     this.token = token;
     this.uid = uid;
     this.providerId = providerId;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 
   public String getUid() {
@@ -65,11 +79,11 @@ public class CustomUser {
     this.email = email;
   }
 
-  public Uri getPhotoUrl() {
+  public String getPhotoUrl() {
     return photoUrl;
   }
 
-  public void setPhotoUrl(Uri photoUrl) {
+  public void setPhotoUrl(String photoUrl) {
     this.photoUrl = photoUrl;
   }
 

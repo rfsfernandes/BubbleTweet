@@ -2,29 +2,27 @@ package pt.rfernandes.bubbletweet.model.viewmodels;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
+import android.net.Uri;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.OAuthProvider;
+import com.twitter.sdk.android.core.TwitterSession;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import pt.rfernandes.bubbletweet.data.Repository;
+import pt.rfernandes.bubbletweet.data.local.DBCallBack;
+import pt.rfernandes.bubbletweet.model.CustomUser;
 
 
 public class MainActivityViewModel extends AndroidViewModel {
   private final Application mApplication;
   private final Repository mRepository;
 
-  public MutableLiveData<FirebaseUser> authLiveData = new MutableLiveData<>();
-  public MutableLiveData<FirebaseUser> mFirebaseUserMutableLiveData = new MutableLiveData<>();
-  private FirebaseAuth mFirebaseAuth;
+  public MutableLiveData<CustomUser> authLiveData = new MutableLiveData<>();
+  public MutableLiveData<CustomUser> mFirebaseUserMutableLiveData = new MutableLiveData<>();
+
 
   /**
    * This méthod creates a new instance of the ViewModel.
@@ -37,56 +35,22 @@ public class MainActivityViewModel extends AndroidViewModel {
     this.mApplication = application;
     this.mRepository = Repository.getInstance(application);
 
-    mFirebaseUserMutableLiveData.postValue(mRepository.getUserLoggedIn(application));
+    mRepository.getUserLoggedIn(object -> mFirebaseUserMutableLiveData.postValue(object));
 
   }
 
-  private void setLoggedInUser(FirebaseUser firebaseUser){
-    this.mRepository.setUserLoggedIn(firebaseUser, mApplication);
-    authLiveData.postValue(firebaseUser);
+  private void setLoggedInUser(TwitterSession session, FirebaseUser firebaseUser) {
+    CustomUser customUser = new CustomUser(session.getAuthToken().secret, firebaseUser.getDisplayName(),
+        firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), session.getAuthToken().token,
+        firebaseUser.getUid(),
+        firebaseUser.getProviderId());
+
+    this.mRepository.setUserLoggedIn(customUser);
+    authLiveData.postValue(customUser);
   }
 
-  public void authTwitter(Activity activity) {
-    mFirebaseAuth = FirebaseAuth.getInstance();
-
-    Task<AuthResult> pendingResultTask = mFirebaseAuth.getPendingAuthResult();
-    if (pendingResultTask != null) {
-      // There's something already here! Finish the sign-in for your user.
-      pendingResultTask
-          .addOnSuccessListener(
-              new OnSuccessListener<AuthResult>() {
-                @Override
-                public void onSuccess(AuthResult authResult) {
-
-                  setLoggedInUser(authResult.getUser());
-                }
-              })
-          .addOnFailureListener(
-              new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                  // Handle failure.
-
-                }
-              });
-    } else {
-      OAuthProvider.Builder provider = OAuthProvider.newBuilder("twitter.com");
-
-      mFirebaseAuth.startActivityForSignInWithProvider(activity, provider.build())
-          .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-              setLoggedInUser(authResult.getUser());
-            }
-          })
-          .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-          });
-    }
-
+  public void authTwitter(TwitterSession session, FirebaseUser firebaseUser) {
+    setLoggedInUser(session, firebaseUser);
 
   }
 
