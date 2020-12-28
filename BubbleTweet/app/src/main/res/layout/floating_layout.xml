@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/AppTheme"
     android:focusable="false">
 
   <RelativeLayout
@@ -15,72 +16,7 @@
         android:id="@+id/showLinLeft"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/r1"
-        android:background="@color/colorAccent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:visibility="gone">
-
-      <androidx.cardview.widget.CardView
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          app:cardCornerRadius="8dp"
-          app:cardBackgroundColor="@color/white"
-          >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp">
-
-          <TextView
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="@string/write_your_tweet" />
-
-          <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_marginTop="16dp"
-              android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/editTextTextLeft"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:focusable="true"
-                android:hint="@string/tweet_something"
-                android:inputType="textPersonName" />
-
-            <Button
-                android:id="@+id/buttonLeft"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:text="@string/send"
-                android:textColor="@color/light_blue_600" />
-
-          </LinearLayout>
-        </LinearLayout>
-      </androidx.cardview.widget.CardView>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/showLinRight"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/r1"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone"
@@ -100,39 +36,146 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp">
 
-          <TextView
+
+          <LinearLayout
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="@string/write_your_tweet" />
+              android:layout_height="40dp"
+              android:gravity="center_vertical"
+              android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imageButtonCancelLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/close_btn" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/buttonLeft"
+                style="@style/SendButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/send_button_background"
+                android:elevation="0dp"
+                android:text="@string/send" />
+          </LinearLayout>
 
           <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_marginTop="16dp"
-              android:orientation="horizontal">
+              android:orientation="horizontal"
+              android:layout_marginStart="15dp">
 
-            <EditText
-                android:id="@+id/editTextTextRight"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:focusable="true"
-                android:hint="@string/tweet_something"
-                android:inputType="textPersonName" />
+                style="@style/TextInputLayoutBubble"
+                >
+
+              <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/editTextTextLeft"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:contextClickable="false"
+                  style="@style/TextInputEditTextBubble"
+                  android:hint="@string/tweet_something"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+          </LinearLayout>
+        </LinearLayout>
+      </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/showLinRight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/r1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp">
+
+      <androidx.cardview.widget.CardView
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          app:cardCornerRadius="8dp"
+          app:cardBackgroundColor="@color/white"
+          >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical">
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="40dp"
+              android:layout_weight="1"
+              android:gravity="center_vertical"
+              android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imageButtonCancelRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/close_btn" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/buttonRight"
+                style="@style/SendButtonTheme"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:text="@string/send"
-                android:textColor="@color/light_blue_600" />
+                android:layout_height="30dp"
+                android:background="@drawable/send_button_background"
+                android:elevation="0dp"
+                android:text="@string/send" />
+
+          </LinearLayout>
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_marginTop="16dp"
+              android:orientation="horizontal"
+              android:layout_marginStart="15dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayoutBubble"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+              <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/editTextTextRight"
+                  style="@style/TextInputEditTextBubble"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:hint="@string/tweet_something" />
+            </com.google.android.material.textfield.TextInputLayout>
 
           </LinearLayout>
         </LinearLayout>
@@ -146,14 +189,21 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/showLinLeft"
+        android:layout_marginTop="10dp"
         android:gravity="center">
 
-      <ImageView
+      <ImageButton
+          android:padding="10dp"
           android:id="@+id/mainButton"
           android:layout_width="50dp"
           android:layout_height="50dp"
-          android:src="@mipmap/ic_launcher" />
+          android:background="@drawable/tweet_bubble_fab_background"
+          android:scaleType="fitCenter"
+          android:src="@drawable/tw__composer_logo_white" />
 
     </RelativeLayout>
+
   </RelativeLayout>
+
+
 </FrameLayout>

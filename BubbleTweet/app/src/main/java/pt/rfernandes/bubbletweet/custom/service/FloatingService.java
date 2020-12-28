@@ -14,12 +14,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.annotation.Nullable;
 import pt.rfernandes.bubbletweet.R;
@@ -40,20 +42,23 @@ public class FloatingService extends Service implements View.OnClickListener,
   private long startClickTime;
   private WindowManager mWindowManager;
   private View mFloatingView;
-  private ImageView mainButton;
+  private ImageButton mainButton;
+  private ImageButton imageButtonCancelLeft;
+  private ImageButton imageButtonCancelRight;
   private LinearLayout showLinLeft;
   private LinearLayout showLinRight;
-  private EditText editTextTextRight;
-  private EditText editTextTextLeft;
+  private TextInputEditText editTextTextRight;
+  private TextInputEditText editTextTextLeft;
   private Button buttonLeft;
   private Button buttonRight;
   private RelativeLayout r1;
   private WindowManager.LayoutParams params;
   private int width = 0;
-  int initialX = 0;
-  int initialY = 0;
-  float initialTouchX = 0;
-  float initialTouchY = 0;
+  private int initialX = 0;
+  private int initialY = 0;
+  private float initialTouchX = 0;
+  private float initialTouchY = 0;
+  private boolean wasOpen = false;
 
   @Nullable
   @Override
@@ -79,16 +84,21 @@ public class FloatingService extends Service implements View.OnClickListener,
     mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
     mWindowManager.addView(mFloatingView, getParams());
 
-    mainButton = (ImageView) mFloatingView.findViewById(R.id.mainButton);
+    mainButton = (ImageButton) mFloatingView.findViewById(R.id.mainButton);
     buttonLeft = (Button) mFloatingView.findViewById(R.id.buttonLeft);
     buttonRight = (Button) mFloatingView.findViewById(R.id.buttonRight);
     showLinLeft = (LinearLayout) mFloatingView.findViewById(R.id.showLinLeft);
     showLinRight = (LinearLayout) mFloatingView.findViewById(R.id.showLinRight);
-    editTextTextRight = (EditText) mFloatingView.findViewById(R.id.editTextTextRight);
-    editTextTextLeft = (EditText) mFloatingView.findViewById(R.id.editTextTextLeft);
+    editTextTextRight = (TextInputEditText) mFloatingView.findViewById(R.id.editTextTextRight);
+    editTextTextLeft = (TextInputEditText) mFloatingView.findViewById(R.id.editTextTextLeft);
+    imageButtonCancelLeft = (ImageButton) mFloatingView.findViewById(R.id.imageButtonCancelLeft);
+    imageButtonCancelRight = (ImageButton) mFloatingView.findViewById(R.id.imageButtonCancelRight);
 
     editTextTextRight.setOnFocusChangeListener(this);
     editTextTextLeft.setOnFocusChangeListener(this);
+
+    imageButtonCancelRight.setOnClickListener(this);
+    imageButtonCancelLeft.setOnClickListener(this);
 
     mainButton.setOnClickListener(this);
     buttonLeft.setOnClickListener(this);
@@ -121,18 +131,7 @@ public class FloatingService extends Service implements View.OnClickListener,
   @Override
   public void onClick(View view) {
     if (view == mainButton) {
-      switch (mSIDE) {
-        case LEFT:
-          showLinRight.setVisibility(View.GONE);
-          showLinLeft.setVisibility(showLinLeft.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-          break;
-        case RIGHT:
-          showLinLeft.setVisibility(View.GONE);
-          showLinRight.setVisibility(showLinRight.getVisibility() == View.VISIBLE ? View.GONE :
-              View.VISIBLE);
-          break;
-      }
-
+      toggleTweetWindow();
     } else if (view == buttonLeft || view == buttonRight) {
       String tweetContent = "";
       switch (mSIDE) {
@@ -153,7 +152,30 @@ public class FloatingService extends Service implements View.OnClickListener,
 
       }
 
+    } else if(view == imageButtonCancelLeft || view == imageButtonCancelRight) {
+      editTextTextLeft.setText("");
+      editTextTextRight.setText("");
+      toggleTweetWindow();
     }
+  }
+
+  private void toggleTweetWindow(){
+
+    switch (mSIDE) {
+      case LEFT:
+        showLinRight.setVisibility(View.GONE);
+        showLinLeft.setVisibility(showLinLeft.getVisibility() == View.VISIBLE ? View.GONE :
+            View.VISIBLE);
+        wasOpen = showLinLeft.getVisibility() == View.VISIBLE;
+        break;
+      case RIGHT:
+        showLinLeft.setVisibility(View.GONE);
+        showLinRight.setVisibility(showLinRight.getVisibility() == View.VISIBLE ? View.GONE :
+            View.VISIBLE);
+        wasOpen = showLinRight.getVisibility() == View.VISIBLE;
+        break;
+    }
+
   }
 
   private void sendTweet(String status) {
@@ -231,6 +253,17 @@ public class FloatingService extends Service implements View.OnClickListener,
         //Update the layout with new X & Y coordinate
         mWindowManager.updateViewLayout(mFloatingView, params);
 
+        switch (mSIDE) {
+          case LEFT:
+            showLinRight.setVisibility(View.GONE);
+            showLinLeft.setVisibility(View.GONE);
+            break;
+          case RIGHT:
+            showLinLeft.setVisibility(View.GONE);
+            showLinRight.setVisibility(View.GONE);
+            break;
+        }
+
         return true;
       case MotionEvent.ACTION_UP:
         long pressDuration = System.currentTimeMillis() - startClickTime;
@@ -238,7 +271,8 @@ public class FloatingService extends Service implements View.OnClickListener,
           // Click event has occurred
           view.performClick();
         } else {
-
+          if(wasOpen)
+            toggleTweetWindow();
           RelativeLayout.LayoutParams lp =
               new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) r1.getLayoutParams());
           if (params.x < (width / 2)) {
@@ -282,11 +316,9 @@ public class FloatingService extends Service implements View.OnClickListener,
   }
 
   private void disableKeyboard() {
-
     params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
     mWindowManager.updateViewLayout(mFloatingView, params);
     UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, false);
-
   }
 
 }
