@@ -1,18 +1,21 @@
 package pt.rfernandes.bubbletweet.model.viewmodels;
 
-import android.app.Activity;
 import android.app.Application;
-import android.net.Uri;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.twitter.sdk.android.core.TwitterSession;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.data.Repository;
-import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 
 
@@ -35,8 +38,39 @@ public class MainActivityViewModel extends AndroidViewModel {
     this.mApplication = application;
     this.mRepository = Repository.getInstance(application);
 
+
+    try {
+      InputStream inputStream = application.getResources().getAssets().open("twitter_consumer_key" +
+          ".txt");
+      Constants.KEY = assetFiletoString(inputStream);
+      inputStream.close();
+
+      inputStream = application.getResources().getAssets().open("twitter_consumer_secret" +
+          ".txt");
+      Constants.SECRET = assetFiletoString(inputStream);
+
+      inputStream.close();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     mRepository.getUserLoggedIn(object -> mFirebaseUserMutableLiveData.postValue(object));
 
+  }
+
+  private String assetFiletoString(InputStream is) throws IOException {
+    StringBuilder buf = new StringBuilder();
+    BufferedReader in =
+        new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+    String str;
+
+    while ((str = in.readLine()) != null) {
+      buf.append(str);
+    }
+
+    in.close();
+
+    return buf.toString();
   }
 
   private void setLoggedInUser(TwitterSession session, FirebaseUser firebaseUser) {

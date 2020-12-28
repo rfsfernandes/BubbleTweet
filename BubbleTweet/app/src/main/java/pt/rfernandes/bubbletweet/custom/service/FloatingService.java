@@ -23,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.Nullable;
 import pt.rfernandes.bubbletweet.R;
+import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.Repository;
 import pt.rfernandes.bubbletweet.data.local.DBCallBack;
@@ -162,8 +163,8 @@ public class FloatingService extends Service implements View.OnClickListener,
       public void returnDB(CustomUser object) {
 
         TweetBody tweetBody =
-            new TweetBody(getResources().getString(R.string.twitter_consumer_key),
-                getResources().getString(R.string.twitter_consumer_secret),
+            new TweetBody(Constants.KEY,
+                Constants.SECRET,
                 object.getToken(), finalTweetContent, object.getUserSecret());
 
         mRepository.sendTweet(tweetBody, new RequestCallBack() {

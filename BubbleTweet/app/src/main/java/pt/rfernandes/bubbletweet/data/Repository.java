@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 
 import androidx.annotation.NonNull;
 import pt.rfernandes.bubbletweet.R;
+import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.data.local.AppDatabase;
 import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.data.remote.DataSource;
@@ -74,7 +75,7 @@ public class Repository {
 
   public void sendTweet(TweetBody tweetBody, RequestCallBack requestCallBack) {
     this.mRequestService = DataSource.getRequestService(tweetBody.getOauth_consumer_key(),
-        application.getResources().getString(R.string.twitter_consumer_secret),
+        Constants.SECRET,
         tweetBody.getOauth_token(), tweetBody.getSecret());
 
     Call<TweetResponse> call = mRequestService.sendTweet(tweetBody.getOauth_version(),

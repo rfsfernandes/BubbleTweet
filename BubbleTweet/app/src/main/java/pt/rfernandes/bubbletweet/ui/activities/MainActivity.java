@@ -31,6 +31,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import pt.rfernandes.bubbletweet.R;
+import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.service.FloatingService;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.viewmodels.MainActivityViewModel;
@@ -48,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    //This code must be entering before the setContentView to make the twitter login work...
-    TwitterAuthConfig mTwitterAuthConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key),
-        getString(R.string.twitter_consumer_secret));
+
+    mMainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+    TwitterAuthConfig mTwitterAuthConfig = new TwitterAuthConfig(Constants.KEY,
+        Constants.SECRET);
     TwitterConfig twitterConfig = new TwitterConfig.Builder(this)
         .twitterAuthConfig(mTwitterAuthConfig)
         .debug(true)
@@ -58,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     Twitter.initialize(twitterConfig);
     setContentView(R.layout.activity_main);
 
-    mMainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
     mFirebaseAuth = FirebaseAuth.getInstance();
     imageView = findViewById(R.id.imageView);
     textViewUsername = findViewById(R.id.textViewUsername);
