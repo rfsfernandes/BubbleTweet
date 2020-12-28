@@ -1,0 +1,9 @@
+<resources>
+  <string name="app_name">BubbleTweet</string>
+  <string name="appwidget_text">TWEET</string>
+  <string name="add_widget">Add widget</string>
+
+  <string name="twitter_consumer_key">I9Vx2aEvYlUUtJdyL0dxIMAGS</string>
+  <string name="twitter_consumer_secret">HQ9i52e4Z4mCzZd1TtMae9TYi6s6iaYNx4edJKBxEyFfApOtRJ</string>
+  <string name="empty_tweet">Can\'t send an empty tweet.</string>
+</resources>
