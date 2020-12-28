@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "63340124750",
+    "project_id": "bubbletweet",
+    "storage_bucket": "bubbletweet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63340124750:android:bacbbc8cdf95d92233811f",
+        "android_client_info": {
+          "package_name": "pt.rfernandes.bubbletweet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "63340124750-heks6r7fbe1iulheb2eqllb8474k2jeq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pt.rfernandes.bubbletweet",
+            "certificate_hash": "863ad032a49d595ef79f601faac54d659d4f28b1"
+          }
+        },
+        {
+          "client_id": "63340124750-lpv33358ff5sls9017qdf5anjaa661rb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi35DWiyD8c42kk1WhMz7q8y-X_gUEOOc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "63340124750-lpv33358ff5sls9017qdf5anjaa661rb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
