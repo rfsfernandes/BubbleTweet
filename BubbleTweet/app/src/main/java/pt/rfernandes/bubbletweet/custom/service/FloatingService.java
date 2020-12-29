@@ -59,6 +59,8 @@ public class FloatingService extends Service implements View.OnClickListener,
   private float initialTouchX = 0;
   private float initialTouchY = 0;
   private boolean wasOpen = false;
+  private float pressedX;
+  private float pressedY;
 
   @Nullable
   @Override
@@ -249,7 +251,8 @@ public class FloatingService extends Service implements View.OnClickListener,
         //remember the initial position.
         initialX = params.x;
         initialY = params.y;
-
+        pressedX = motionEvent.getX();
+        pressedY = motionEvent.getY();
         //get the touch location
         initialTouchX = view.getX() - motionEvent.getRawX();
         initialTouchY = view.getY() - motionEvent.getRawY();
@@ -268,7 +271,7 @@ public class FloatingService extends Service implements View.OnClickListener,
         return true;
       case MotionEvent.ACTION_UP:
         long pressDuration = System.currentTimeMillis() - startClickTime;
-        if (pressDuration < MAX_CLICK_DURATION) {
+        if (pressDuration < MAX_CLICK_DURATION && distance(pressedX, pressedY, motionEvent.getX(), motionEvent.getY()) < MAX_CLICK_DISTANCE) {
           // Click event has occurred
           view.performClick();
         } else {
@@ -298,6 +301,18 @@ public class FloatingService extends Service implements View.OnClickListener,
     }
     return false;
   }
+
+  private float distance(float x1, float y1, float x2, float y2) {
+    float dx = x1 - x2;
+    float dy = y1 - y2;
+    float distanceInPx = (float) Math.sqrt(dx * dx + dy * dy);
+    return pxToDp(distanceInPx);
+  }
+
+  private float pxToDp(float px) {
+    return px / getApplicationContext().getResources().getDisplayMetrics().density;
+  }
+
 
   @Override
   public void onFocusChange(View v, boolean hasFocus) {
