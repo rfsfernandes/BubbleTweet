@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -25,13 +26,13 @@ import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.Repository;
-import pt.rfernandes.bubbletweet.data.local.DBCallBack;
+import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import pt.rfernandes.bubbletweet.data.remote.RequestCallBack;
-import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.TweetBody;
 import pt.rfernandes.bubbletweet.ui.activities.MainActivity;
+import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
 
-public class FloatingService extends Service implements View.OnClickListener,
+public class FloatingService extends Service implements
     View.OnTouchListener, View.OnFocusChangeListener {
   private static final int MAX_CLICK_DURATION = 200;
   private static final int MAX_CLICK_DISTANCE = 15;
@@ -47,6 +48,8 @@ public class FloatingService extends Service implements View.OnClickListener,
   private ImageButton imageButtonDefsRight;
   private LinearLayout showLinLeft;
   private LinearLayout showLinRight;
+  private TextView textViewUserAtRight;
+  private TextView textViewUserAtLeft;
   private TextInputEditText editTextTextRight;
   private TextInputEditText editTextTextLeft;
   private Button buttonLeft;
@@ -54,6 +57,7 @@ public class FloatingService extends Service implements View.OnClickListener,
   private RelativeLayout r1;
   private WindowManager.LayoutParams params;
   private int width = 0;
+  private int height = 0;
   private int initialX = 0;
   private int initialY = 0;
   private float initialTouchX = 0;
@@ -76,7 +80,7 @@ public class FloatingService extends Service implements View.OnClickListener,
     Point size = new Point();
     display.getSize(size);
     width = size.x;
-
+    height = size.y;
 
     //Inflate the floating view layout we created
     mFloatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
@@ -97,18 +101,29 @@ public class FloatingService extends Service implements View.OnClickListener,
     imageButtonCancelRight = (ImageButton) mFloatingView.findViewById(R.id.imageButtonCancelRight);
     imageButtonDefsLeft = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDefsLeft);
     imageButtonDefsRight = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDefsRight);
+    textViewUserAtRight = (TextView) mFloatingView.findViewById(R.id.textViewUserAtRight);
+    textViewUserAtLeft = (TextView) mFloatingView.findViewById(R.id.textViewUserAtLeft);
+
+    mRepository.getUserLoggedIn(user -> {
+      textViewUserAtLeft.setText(String.format("%s @%s", getString(R.string.as_at) ,user.getUsername()));
+      textViewUserAtRight.setText(String.format("%s @%s", getString(R.string.as_at),user.getUsername()));
+    });
+
     editTextTextRight.setOnFocusChangeListener(this);
     editTextTextLeft.setOnFocusChangeListener(this);
+//    editTextTextRight.setOnTouchListener(editTextTouchListener);
+//    editTextTextLeft.setOnTouchListener(editTextTouchListener);
 
-    imageButtonDefsLeft.setOnClickListener(this);
-    imageButtonDefsRight.setOnClickListener(this);
+    imageButtonDefsLeft.setOnClickListener(defsClick);
+    imageButtonDefsRight.setOnClickListener(defsClick);
 
-    imageButtonCancelRight.setOnClickListener(this);
-    imageButtonCancelLeft.setOnClickListener(this);
+    imageButtonCancelRight.setOnClickListener(cancelClick);
+    imageButtonCancelLeft.setOnClickListener(cancelClick);
 
-    mainButton.setOnClickListener(this);
-    buttonLeft.setOnClickListener(this);
-    buttonRight.setOnClickListener(this);
+    mainButton.setOnClickListener(mainButtonClick);
+
+    buttonLeft.setOnClickListener(sendTweetClick);
+    buttonRight.setOnClickListener(sendTweetClick);
 //    btnClose.setOnClickListener(this);
 
     //Drag and move floating view using user's touch action.
@@ -134,11 +149,24 @@ public class FloatingService extends Service implements View.OnClickListener,
     return params;
   }
 
-  @Override
-  public void onClick(View view) {
-    if (view == mainButton) {
-      toggleTweetWindow();
-    } else if (view == buttonLeft || view == buttonRight) {
+  private final View.OnTouchListener editTextTouchListener = new View.OnTouchListener() {
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+      if (event.getAction() == MotionEvent.ACTION_UP) {
+        enableKeyboard();
+      }
+      if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS) {
+        v.performClick();
+      }
+      return false;
+    }
+  };
+
+  private final View.OnClickListener mainButtonClick = v -> toggleTweetWindow();
+
+  private final View.OnClickListener sendTweetClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
       String tweetContent = "";
       switch (mSIDE) {
         case LEFT:
@@ -154,21 +182,47 @@ public class FloatingService extends Service implements View.OnClickListener,
         showMessage(getString(R.string.empty_tweet));
 
       } else {
-        sendTweet(tweetContent);
+        if(Constants.ADS_DEBUGGER){
+          startAds();
+        } else {
+          if (tweetContent.length() > 280) {
+            showMessage(getString(R.string.tweet_too_big));
+            disableKeyboard();
+          } else {
+            if (SharedPreferencesManager.getInstance(getApplication()).getAvailableTokens() == 0) {
+              startAds();
+            } else {
+              sendTweet(tweetContent);
+            }
+          }
+        }
 
       }
+    }
+  };
 
-    } else if (view == imageButtonCancelLeft || view == imageButtonCancelRight) {
+  private void startAds(){
+    Intent intent = new Intent(FloatingService.this, GoodiesActivity.class);
+    startActivity(intent);
+    FloatingService.this.stopSelf();
+  }
+
+  private final View.OnClickListener cancelClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
       editTextTextLeft.setText("");
       editTextTextRight.setText("");
       toggleTweetWindow();
-    } else if (view == imageButtonDefsLeft || view == imageButtonDefsRight) {
-      Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-      startActivity(intent);
-      toggleTweetWindow();
-      this.stopSelf();
     }
-  }
+  };
+
+  private final View.OnClickListener defsClick = v -> {
+    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+    startActivity(intent);
+    toggleTweetWindow();
+    FloatingService.this.stopSelf();
+  };
+
 
   private void toggleTweetWindow() {
 
@@ -190,39 +244,33 @@ public class FloatingService extends Service implements View.OnClickListener,
   }
 
   private void sendTweet(String status) {
-    String finalTweetContent = status;
-    mRepository.getUserLoggedIn(new DBCallBack<CustomUser>() {
-      @Override
-      public void returnDB(CustomUser object) {
+    mRepository.getUserLoggedIn(object -> {
 
-        TweetBody tweetBody =
-            new TweetBody(Constants.KEY,
-                Constants.SECRET,
-                object.getToken(), finalTweetContent, object.getUserSecret());
+      TweetBody tweetBody =
+          new TweetBody(Constants.KEY,
+              Constants.SECRET,
+              object.getToken(), status, object.getUserSecret());
 
-        mRepository.sendTweet(tweetBody, new RequestCallBack() {
-          @Override
-          public void success() {
-            new Handler(getMainLooper()).post(new Runnable() {
-              @Override
-              public void run() {
-                showMessage(getString(R.string.tweet_success));
-              }
-            });
-          }
+      mRepository.sendTweet(tweetBody, new RequestCallBack() {
+        @Override
+        public void success() {
+          int availableTokens =
+              SharedPreferencesManager.getInstance(getApplication()).getAvailableTokens();
+          SharedPreferencesManager.getInstance(getApplication()).setTokenKey(availableTokens - 1);
+          new Handler(getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+              showMessage(getString(R.string.tweet_success));
+            }
+          });
+        }
 
-          @Override
-          public void failure(String error) {
+        @Override
+        public void failure(String error) {
 //            looper.
-            new Handler(getMainLooper()).post(new Runnable() {
-              @Override
-              public void run() {
-                showMessage(error);
-              }
-            });
-          }
-        });
-      }
+          new Handler(getMainLooper()).post(() -> showMessage(error));
+        }
+      });
     });
   }
 
@@ -246,6 +294,9 @@ public class FloatingService extends Service implements View.OnClickListener,
   public boolean onTouch(View view, MotionEvent motionEvent) {
 
     switch (motionEvent.getAction()) {
+      case MotionEvent.ACTION_BUTTON_PRESS:
+        int n = 0;
+        break;
       case MotionEvent.ACTION_DOWN:
         startClickTime = System.currentTimeMillis();
         //remember the initial position.
@@ -261,7 +312,7 @@ public class FloatingService extends Service implements View.OnClickListener,
 //        //Calculate the X and Y coordinates of the view.
         params.x = (int) (motionEvent.getRawX() - initialTouchX) - initialX - view.getWidth();
         params.y = (int) (motionEvent.getRawY() - initialTouchY) - initialY - view.getHeight() * 2;
-
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         //Update the layout with new X & Y coordinate
         mWindowManager.updateViewLayout(mFloatingView, params);
 
@@ -271,14 +322,15 @@ public class FloatingService extends Service implements View.OnClickListener,
         return true;
       case MotionEvent.ACTION_UP:
         long pressDuration = System.currentTimeMillis() - startClickTime;
+
         if (pressDuration < MAX_CLICK_DURATION && distance(pressedX, pressedY, motionEvent.getX(), motionEvent.getY()) < MAX_CLICK_DISTANCE) {
           // Click event has occurred
           view.performClick();
         } else {
-          if (wasOpen)
-            toggleTweetWindow();
+
           RelativeLayout.LayoutParams lp =
               new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) r1.getLayoutParams());
+
           if (params.x < (width / 2)) {
             mSIDE = UtilsClass.SIDE.LEFT;
             params.x = 0;
@@ -293,9 +345,14 @@ public class FloatingService extends Service implements View.OnClickListener,
             editTextTextRight.requestFocus();
           }
           r1.setLayoutParams(lp);
-
+          params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
           mWindowManager.updateViewLayout(mFloatingView, params);
+
+          if (wasOpen)
+            toggleTweetWindow();
+
         }
+
         return true;
 
     }
@@ -326,6 +383,10 @@ public class FloatingService extends Service implements View.OnClickListener,
   private void enableKeyboard() {
 
     params.flags = 0;
+    double heightPercentage = height * 0.15;
+    if (params.y > (int) heightPercentage) {
+      params.y = (int) heightPercentage;
+    }
     mWindowManager.updateViewLayout(mFloatingView, params);
     UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, true);
 

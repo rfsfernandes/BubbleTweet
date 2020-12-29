@@ -1,16 +1,33 @@
 <resources>
   <string name="app_name">BubbleTweet</string>
-  <string name="appwidget_text">TWEET</string>
+  <string name="appwidget_text" translatable="false">TWEET</string>
   <string name="add_widget">Add widget</string>
 
   <string name="empty_tweet">Can\'t send an empty tweet.</string>
-  <string name="send">Tweet</string>
+  <string name="send" translatable="false">Tweet</string>
   <string name="write_your_tweet">Write your tweet</string>
   <string name="tweet_something">Tweet something…</string>
   <string name="tweet_success">Tweet successfully sent.</string>
-  <string name="login_failed">Login failed. No internet or No Twitter app found on your phone</string>
+  <string name="login_failed">Login failed. No internet or No Twitter app found on your phone.</string>
   <string name="signed_in_success">Signed in to twitter successful</string>
   <string name="error_occurred">An error has occurred. Try again later.</string>
   <string name="logout">logout</string>
   <string name="activate_bubble">Activate Bubble</string>
+  <string name="title_activity_goodies" translatable="false">MainActivity</string>
+  <string name="action_settings" translatable="false">Settings</string>
+
+
+  <string name="interstitial_ad_sample" translatable="false">Interstitial Ad Sample</string>
+  <string name="start_level" translatable="false">Level 1</string>
+  <string name="next_level" translatable="false">Next Level</string>
+  <!-- -
+        This is an ad unit ID for an interstitial test ad. Replace with your own interstitial ad unit id.
+        For more information, see https://support.google.com/admob/answer/3052638
+    <!- -->
+  <string name="interstitial_ad_unit_id" translatable="false">ca-app-pub-5556364700570622/7508076897</string>
+  <string name="no_ads_to_show">No ads to show. Enjoy :)</string>
+  <string name="thank_you_ad">Thank you for the patience!</string>
+  <string name="sorry_ads">I\'m sorry, but I need to pay my bills. :(</string>
+  <string name="tweet_too_big">Tweet too big. Stay inside the 280 character length plase.</string>
+  <string name="as_at">As</string>
 </resources>

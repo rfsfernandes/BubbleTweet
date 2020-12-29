@@ -13,7 +13,7 @@ import pt.rfernandes.bubbletweet.model.CustomUser;
 
 public class SharedPreferencesManager {
   private static final String SHARED_PREFS = "SHARED_PREFS";
-  private static final String USER_KEY = "USER:KEY";
+  private static final String TOKEN_KEY = "TOKEN:KEY";
   private static SharedPreferencesManager instance;
   private static SharedPreferences sharedPrefs;
   private static SharedPreferences.Editor sharedPrefsEditor;
@@ -34,25 +34,21 @@ public class SharedPreferencesManager {
     }
   }
 
-  public void setUserLoggedIn(CustomUser customUser){
-
-    String user = new Gson().toJson(customUser);
-
+  public void setTokenKey(int tokens){
     if (sharedPrefs == null || sharedPrefsEditor == null) {
       sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
       sharedPrefsEditor = sharedPrefs.edit();
 
     }
-    sharedPrefsEditor.putString(USER_KEY, user);
+    sharedPrefsEditor.putInt(TOKEN_KEY, tokens);
     sharedPrefsEditor.apply();
   }
 
-  public CustomUser getUserLoggedIn() {
+  public int getAvailableTokens() {
     if (sharedPrefs == null) {
       sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
-    String user = sharedPrefs.getString(USER_KEY, "");
-    return new Gson().fromJson(user, CustomUser.class);
+    return sharedPrefs.getInt(TOKEN_KEY, 3);
   }
 
 }

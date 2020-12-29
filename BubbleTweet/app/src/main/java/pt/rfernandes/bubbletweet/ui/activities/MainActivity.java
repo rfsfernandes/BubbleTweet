@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         Constants.SECRET);
     TwitterConfig twitterConfig = new TwitterConfig.Builder(this)
         .twitterAuthConfig(mTwitterAuthConfig)
-        .debug(true)
+        .debug(Constants.TW_DEBUGGER)
         .build();
     Twitter.initialize(twitterConfig);
     setContentView(R.layout.activity_main);
