@@ -67,10 +67,21 @@ public class Repository {
     new Thread(new Runnable() {
       @Override
       public void run() {
+        appDatabase.getTemplateDAO().deleteUser();
         appDatabase.getTemplateDAO().insertUser(customUser);
       }
     }).start();
 
+  }
+
+  public void logout(DBCallBack<Boolean> dbCallBack){
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        appDatabase.getTemplateDAO().deleteUser();
+        dbCallBack.returnDB(true);
+      }
+    }).start();
   }
 
   public void sendTweet(TweetBody tweetBody, RequestCallBack requestCallBack) {

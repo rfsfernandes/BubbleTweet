@@ -16,6 +16,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.data.Repository;
+import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 
 
@@ -74,7 +75,8 @@ public class MainActivityViewModel extends AndroidViewModel {
   }
 
   private void setLoggedInUser(TwitterSession session, FirebaseUser firebaseUser) {
-    CustomUser customUser = new CustomUser(session.getAuthToken().secret, firebaseUser.getDisplayName(),
+    CustomUser customUser = new CustomUser(session.getUserName(), session.getAuthToken().secret,
+        firebaseUser.getDisplayName(),
         firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), session.getAuthToken().token,
         firebaseUser.getUid(),
         firebaseUser.getProviderId());
@@ -85,7 +87,15 @@ public class MainActivityViewModel extends AndroidViewModel {
 
   public void authTwitter(TwitterSession session, FirebaseUser firebaseUser) {
     setLoggedInUser(session, firebaseUser);
+  }
 
+  public void logout(){
+    this.mRepository.logout(new DBCallBack<Boolean>() {
+      @Override
+      public void returnDB(Boolean object) {
+        authLiveData.postValue(null);
+      }
+    });
   }
 
 

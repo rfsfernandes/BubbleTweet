@@ -54,7 +54,12 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/transparent"
                 android:src="@drawable/close_btn" />
-
+            <ImageButton
+                android:id="@+id/imageButtonDefsLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/settings_btn" />
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -105,7 +110,7 @@
         android:layout_toStartOf="@+id/r1"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
@@ -140,6 +145,12 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/transparent"
                 android:src="@drawable/close_btn" />
+            <ImageButton
+                android:id="@+id/imageButtonDefsRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/settings_btn" />
 
             <Space
                 android:layout_width="0dp"

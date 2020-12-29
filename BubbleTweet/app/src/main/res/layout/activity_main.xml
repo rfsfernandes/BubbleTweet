@@ -7,31 +7,74 @@
     android:layout_height="match_parent">
 
 
-  <androidx.constraintlayout.widget.Guideline
-      android:id="@+id/guideline2"
+  <Button
+      android:id="@+id/buttonActivateService"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      app:layout_constraintGuide_percent="0.2" />
-
-  <ImageView
-      android:id="@+id/imageView"
-      android:layout_width="150dp"
-      android:layout_height="150dp"
+      android:layout_height="40dp"
+      android:background="@drawable/activate_button_background"
+      android:backgroundTint="@color/colorAccent"
+      android:paddingEnd="15dp"
+      android:paddingStart="15dp"
+      android:text="@string/activate_bubble"
+      android:textAllCaps="false"
+      android:textColor="@color/white"
+      android:textSize="12sp"
+      android:textStyle="bold"
+      android:visibility="gone"
+      app:layout_constraintBottom_toTopOf="@+id/createBtn"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/guideline2"
-      tools:src="@tools:sample/avatars" />
+      app:layout_constraintTop_toBottomOf="@+id/linearLayoutUserInfo" />
 
-  <TextView
-      android:id="@+id/textViewUsername"
+  <Button
+      android:id="@+id/buttonLogout"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginTop="32dp"
-      android:text="TextView"
-      app:layout_constraintEnd_toEndOf="@+id/imageView"
-      app:layout_constraintStart_toStartOf="@+id/imageView"
-      app:layout_constraintTop_toBottomOf="@+id/imageView" />
+      android:background="@android:color/transparent"
+      android:backgroundTint="@android:color/transparent"
+      android:text="@string/logout"
+      android:textColor="@color/colorAccent"
+      android:visibility="invisible"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <LinearLayout
+      android:id="@+id/linearLayoutUserInfo"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:orientation="vertical"
+      android:visibility="gone"
+      app:layout_constraintBottom_toTopOf="@+id/buttonActivateService"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.74">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/textViewDisplayName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textSize="14sp" />
+
+  </LinearLayout>
 
   <com.twitter.sdk.android.core.identity.TwitterLoginButton
       android:id="@+id/createBtn"
@@ -40,9 +83,22 @@
       android:layout_centerHorizontal="true"
       android:layout_centerVertical="true"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="@+id/imageView"
-      app:layout_constraintStart_toStartOf="@+id/imageView"
-      app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/buttonActivateService" />
+
+  <ProgressBar
+      android:id="@+id/progressBar"
+      style="?android:attr/progressBarStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:indeterminate="true"
+      android:visibility="gone"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

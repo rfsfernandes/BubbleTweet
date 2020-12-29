@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import butterknife.ButterKnife;
+
 import pt.rfernandes.bubbletweet.R;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,7 +56,7 @@ public class TemplateAdapter extends RecyclerView.Adapter<TemplateAdapter.Templa
 
 			TemplateViewHolder(@NonNull View itemView) {
 				 super(itemView);
-				 ButterKnife.bind(this, itemView);
+//				 ButterKnife.bind(this, itemView);
 			}
 
 			/**

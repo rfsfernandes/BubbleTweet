@@ -16,12 +16,15 @@ public class CustomUser {
   private String token;
   private String uid;
   private String providerId;
+  private String username;
 
   public CustomUser() {
   }
 
-  public CustomUser(String userSecret, String name, String email, String photoUri, String token,
+  public CustomUser(String username, String userSecret, String name, String email, String photoUri,
+                    String token,
                     String uid, String providerId) {
+    this.username = username;
     this.userSecret = userSecret;
     this.name = name;
     this.email = email;
@@ -29,6 +32,14 @@ public class CustomUser {
     this.token = token;
     this.uid = uid;
     this.providerId = providerId;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public long getId() {

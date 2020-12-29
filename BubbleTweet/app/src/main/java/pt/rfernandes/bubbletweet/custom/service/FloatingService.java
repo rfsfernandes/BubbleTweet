@@ -13,14 +13,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.annotation.Nullable;
@@ -32,6 +29,7 @@ import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.data.remote.RequestCallBack;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.TweetBody;
+import pt.rfernandes.bubbletweet.ui.activities.MainActivity;
 
 public class FloatingService extends Service implements View.OnClickListener,
     View.OnTouchListener, View.OnFocusChangeListener {
@@ -45,6 +43,8 @@ public class FloatingService extends Service implements View.OnClickListener,
   private ImageButton mainButton;
   private ImageButton imageButtonCancelLeft;
   private ImageButton imageButtonCancelRight;
+  private ImageButton imageButtonDefsLeft;
+  private ImageButton imageButtonDefsRight;
   private LinearLayout showLinLeft;
   private LinearLayout showLinRight;
   private TextInputEditText editTextTextRight;
@@ -93,9 +93,13 @@ public class FloatingService extends Service implements View.OnClickListener,
     editTextTextLeft = (TextInputEditText) mFloatingView.findViewById(R.id.editTextTextLeft);
     imageButtonCancelLeft = (ImageButton) mFloatingView.findViewById(R.id.imageButtonCancelLeft);
     imageButtonCancelRight = (ImageButton) mFloatingView.findViewById(R.id.imageButtonCancelRight);
-
+    imageButtonDefsLeft = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDefsLeft);
+    imageButtonDefsRight = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDefsRight);
     editTextTextRight.setOnFocusChangeListener(this);
     editTextTextLeft.setOnFocusChangeListener(this);
+
+    imageButtonDefsLeft.setOnClickListener(this);
+    imageButtonDefsRight.setOnClickListener(this);
 
     imageButtonCancelRight.setOnClickListener(this);
     imageButtonCancelLeft.setOnClickListener(this);
@@ -152,14 +156,19 @@ public class FloatingService extends Service implements View.OnClickListener,
 
       }
 
-    } else if(view == imageButtonCancelLeft || view == imageButtonCancelRight) {
+    } else if (view == imageButtonCancelLeft || view == imageButtonCancelRight) {
       editTextTextLeft.setText("");
       editTextTextRight.setText("");
       toggleTweetWindow();
+    } else if (view == imageButtonDefsLeft || view == imageButtonDefsRight) {
+      Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+      startActivity(intent);
+      toggleTweetWindow();
+      this.stopSelf();
     }
   }
 
-  private void toggleTweetWindow(){
+  private void toggleTweetWindow() {
 
     switch (mSIDE) {
       case LEFT:
@@ -253,16 +262,8 @@ public class FloatingService extends Service implements View.OnClickListener,
         //Update the layout with new X & Y coordinate
         mWindowManager.updateViewLayout(mFloatingView, params);
 
-        switch (mSIDE) {
-          case LEFT:
-            showLinRight.setVisibility(View.GONE);
-            showLinLeft.setVisibility(View.GONE);
-            break;
-          case RIGHT:
-            showLinLeft.setVisibility(View.GONE);
-            showLinRight.setVisibility(View.GONE);
-            break;
-        }
+        showLinRight.setVisibility(View.GONE);
+        showLinLeft.setVisibility(View.GONE);
 
         return true;
       case MotionEvent.ACTION_UP:
@@ -271,7 +272,7 @@ public class FloatingService extends Service implements View.OnClickListener,
           // Click event has occurred
           view.performClick();
         } else {
-          if(wasOpen)
+          if (wasOpen)
             toggleTweetWindow();
           RelativeLayout.LayoutParams lp =
               new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) r1.getLayoutParams());

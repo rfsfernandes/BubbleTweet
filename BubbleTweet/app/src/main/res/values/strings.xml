@@ -8,4 +8,9 @@
   <string name="write_your_tweet">Write your tweet</string>
   <string name="tweet_something">Tweet something…</string>
   <string name="tweet_success">Tweet successfully sent.</string>
+  <string name="login_failed">Login failed. No internet or No Twitter app found on your phone</string>
+  <string name="signed_in_success">Signed in to twitter successful</string>
+  <string name="error_occurred">An error has occurred. Try again later.</string>
+  <string name="logout">logout</string>
+  <string name="activate_bubble">Activate Bubble</string>
 </resources>

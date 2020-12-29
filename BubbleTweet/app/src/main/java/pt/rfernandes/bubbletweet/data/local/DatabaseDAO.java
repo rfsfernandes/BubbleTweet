@@ -19,8 +19,8 @@ public interface DatabaseDAO {
    * To get all objects from the table Object
    */
 
-  @Query("DELETE FROM CustomUser WHERE id = :id")
-  void deleteUser(long id);
+  @Query("DELETE FROM CustomUser")
+  void deleteUser();
 
   @Insert
   void insertUser(CustomUser customUser);

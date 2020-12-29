@@ -42,10 +42,7 @@ dependencies {
   implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
   implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
-  // butterknife
-  def butterknife_version = '10.1.0'
-  implementation "com.jakewharton:butterknife:$butterknife_version"
-  annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife_version"
+  implementation 'de.hdodenhof:circleimageview:3.1.0'
 
   // Room
   def room_version = "2.2.6"
