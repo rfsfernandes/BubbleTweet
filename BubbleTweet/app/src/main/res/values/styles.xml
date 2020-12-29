@@ -25,7 +25,7 @@
     <item name="android:ems">10</item>
     <item name="android:focusable">true</item>
     <item name="android:importantForAutofill">no</item>
-    <item name="android:inputType">textMultiLine|textPersonName</item>
+    <item name="android:inputType">textMultiLine|text</item>
     <item name="android:background">@null</item>
   </style>
 
