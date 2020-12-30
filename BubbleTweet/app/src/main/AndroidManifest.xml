@@ -8,10 +8,14 @@
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
       android:supportsRtl="true"
-      android:theme="@style/AppTheme">
+      android:theme="@style/AppTheme"
+      android:name=".custom.MyApp">
     <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
         android:value="ca-app-pub-5556364700570622~7189540368"/>
+    <meta-data
+        android:name="com.bugsnag.android.API_KEY"
+        android:value="bdf20be8ba623df018e7e721c5cf9341"/>
     <activity
         android:name=".ui.goodies.GoodiesActivity"
         android:label="@string/title_activity_goodies"/>
