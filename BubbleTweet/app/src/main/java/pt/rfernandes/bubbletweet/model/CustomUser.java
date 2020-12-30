@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class CustomUser {
-  @PrimaryKey(autoGenerate = true)
+  @PrimaryKey
   private long id;
   private String userSecret;
   private String name;
@@ -21,9 +21,11 @@ public class CustomUser {
   public CustomUser() {
   }
 
-  public CustomUser(String username, String userSecret, String name, String email, String photoUri,
+  public CustomUser(long id, String username, String userSecret, String name, String email,
+                    String photoUri,
                     String token,
                     String uid, String providerId) {
+    this.id = id;
     this.username = username;
     this.userSecret = userSecret;
     this.name = name;

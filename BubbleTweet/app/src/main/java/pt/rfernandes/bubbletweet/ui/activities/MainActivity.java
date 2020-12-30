@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
   private void initViewModel() {
     mMainActivityViewModel.authLiveData.observe(this, authResult -> {
       progressBar.setVisibility(View.GONE);
-      if (authResult != null) {
+       if (authResult != null) {
         setViews(authResult, true);
       } else {
         setViews(null, false);

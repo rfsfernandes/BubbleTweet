@@ -217,13 +217,11 @@
         android:layout_marginTop="10dp"
         android:gravity="center">
 
-      <ImageButton
-          android:padding="10dp"
+      <com.google.android.material.floatingactionbutton.FloatingActionButton
           android:id="@+id/mainButton"
-          android:layout_width="50dp"
-          android:layout_height="50dp"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
           android:background="@drawable/tweet_bubble_fab_background"
-          android:scaleType="fitCenter"
           android:src="@drawable/tw__composer_logo_white" />
 
     </RelativeLayout>

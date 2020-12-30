@@ -75,7 +75,8 @@ public class MainActivityViewModel extends AndroidViewModel {
   }
 
   private void setLoggedInUser(TwitterSession session, FirebaseUser firebaseUser) {
-    CustomUser customUser = new CustomUser(session.getUserName(), session.getAuthToken().secret,
+    CustomUser customUser = new CustomUser(session.getUserId(), session.getUserName(),
+        session.getAuthToken().secret,
         firebaseUser.getDisplayName(),
         firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), session.getAuthToken().token,
         firebaseUser.getUid(),
