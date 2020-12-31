@@ -15,7 +15,6 @@
 
   <style name="TextInputLayoutBubble">
     <item name="counterEnabled">true</item>
-    <item name="counterMaxLength">280</item>
     <item name="android:layout_weight">1</item>
     <item name="counterTextColor">@color/colorAccent</item>
     <item name="android:importantForAutofill">no</item>

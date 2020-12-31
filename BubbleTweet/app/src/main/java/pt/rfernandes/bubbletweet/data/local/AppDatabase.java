@@ -9,8 +9,9 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import pt.rfernandes.bubbletweet.model.CustomUser;
+import pt.rfernandes.bubbletweet.model.TweetCreds;
 
-@Database(entities = {CustomUser.class},
+@Database(entities = {CustomUser.class, TweetCreds.class},
     version = DBContract.DATABASE_VERSION,
     exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {

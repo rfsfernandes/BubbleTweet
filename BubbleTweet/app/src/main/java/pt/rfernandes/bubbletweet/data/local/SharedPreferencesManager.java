@@ -11,9 +11,12 @@ import com.twitter.sdk.android.core.TwitterSession;
 
 import pt.rfernandes.bubbletweet.model.CustomUser;
 
+import static pt.rfernandes.bubbletweet.custom.Constants.TWEET_SPAN_TILL_AD;
+
 public class SharedPreferencesManager {
   private static final String SHARED_PREFS = "SHARED_PREFS";
   private static final String TOKEN_KEY = "TOKEN:KEY";
+  private static final String TWEET_ENDING_KEY = "TWEET_ENDING:KEY";
   private static SharedPreferencesManager instance;
   private static SharedPreferences sharedPrefs;
   private static SharedPreferences.Editor sharedPrefsEditor;
@@ -48,7 +51,24 @@ public class SharedPreferencesManager {
     if (sharedPrefs == null) {
       sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
-    return sharedPrefs.getInt(TOKEN_KEY, 3);
+    return sharedPrefs.getInt(TOKEN_KEY, TWEET_SPAN_TILL_AD);
+  }
+
+  public void setTweetEndingValue(boolean checked){
+    if (sharedPrefs == null || sharedPrefsEditor == null) {
+      sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+      sharedPrefsEditor = sharedPrefs.edit();
+
+    }
+    sharedPrefsEditor.putBoolean(TWEET_ENDING_KEY, checked);
+    sharedPrefsEditor.commit();
+  }
+
+  public boolean getTweetEndingValue() {
+    if (sharedPrefs == null) {
+      sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    }
+    return sharedPrefs.getBoolean(TWEET_ENDING_KEY, true);
   }
 
 }

@@ -16,7 +16,7 @@
       android:paddingEnd="15dp"
       android:paddingStart="15dp"
       android:text="@string/activate_bubble"
-      android:textAllCaps="false"
+      android:textAllCaps="true"
       android:textColor="@color/white"
       android:textSize="12sp"
       android:textStyle="bold"
@@ -73,6 +73,39 @@
         android:layout_marginTop="8dp"
         android:text="TextView"
         android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+      <com.google.android.material.switchmaterial.SwitchMaterial
+          android:id="@+id/switch1"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/mention_bubbletweet_in_the_end_of_my_tweets" />
+
+      <TextView
+          android:id="@+id/textView"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:gravity="center"
+          android:text="@string/enabling_this_feature_will_help_bubbletweet_reach_more_people_it_would_help_us_a_lot" />
+
+      <TextView
+          android:id="@+id/textView2"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:gravity="center"
+          android:text="@string/please_consider_enabling_it_thank_you" />
+
+    </LinearLayout>
 
   </LinearLayout>
 

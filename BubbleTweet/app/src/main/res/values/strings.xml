@@ -1,6 +1,5 @@
 <resources>
   <string name="app_name">BubbleTweet</string>
-  <string name="appwidget_text" translatable="false">TWEET</string>
   <string name="add_widget">Add widget</string>
 
   <string name="empty_tweet">Can\'t send an empty tweet.</string>
@@ -28,6 +27,10 @@
   <string name="no_ads_to_show">No ads to show. Enjoy :)</string>
   <string name="thank_you_ad">Thank you for the patience!</string>
   <string name="sorry_ads">I\'m sorry, but I need to pay my bills. :(</string>
-  <string name="tweet_too_big">Tweet too big. Stay inside the 280 character length plase.</string>
+  <string name="tweet_too_big">Tweet too big. Stay inside the %d character length plase.</string>
   <string name="as_at">As</string>
+  <string name="please_consider_enabling_it_thank_you">Please consider enabling it. Thank you.</string>
+  <string name="enabling_this_feature_will_help_bubbletweet_reach_more_people_it_would_help_us_a_lot">Enabling this feature will help BubbleTweet reach more people. It would help us a lot!</string>
+  <string name="mention_bubbletweet_in_the_end_of_my_tweets">Mention BubbleTweet in the end of my tweets</string>
+  <string name="tweet_sent_from_bubble" translatable="false">&#160;-&#160;Tweet sent from BubbleTweet</string>
 </resources>

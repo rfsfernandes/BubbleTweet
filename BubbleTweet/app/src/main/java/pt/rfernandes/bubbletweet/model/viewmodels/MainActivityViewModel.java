@@ -3,6 +3,11 @@ package pt.rfernandes.bubbletweet.model.viewmodels;
 import android.app.Application;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.twitter.sdk.android.core.TwitterSession;
 
 import java.io.BufferedReader;
@@ -39,24 +44,14 @@ public class MainActivityViewModel extends AndroidViewModel {
     this.mApplication = application;
     this.mRepository = Repository.getInstance(application);
 
+  }
 
-    try {
-      InputStream inputStream = application.getResources().getAssets().open("twitter_consumer_key" +
-          ".txt");
-      Constants.KEY = assetFiletoString(inputStream);
-      inputStream.close();
+  public void getTokens(FirebaseRTDBCallBack callBack){
 
-      inputStream = application.getResources().getAssets().open("twitter_consumer_secret" +
-          ".txt");
-      Constants.SECRET = assetFiletoString(inputStream);
+  }
 
-      inputStream.close();
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public void getLoggedInUser(){
     mRepository.getUserLoggedIn(object -> mFirebaseUserMutableLiveData.postValue(object));
-
   }
 
   private String assetFiletoString(InputStream is) throws IOException {
@@ -78,7 +73,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     CustomUser customUser = new CustomUser(session.getUserId(), session.getUserName(),
         session.getAuthToken().secret,
         firebaseUser.getDisplayName(),
-        firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString(), session.getAuthToken().token,
+        firebaseUser.getEmail(), firebaseUser.getPhotoUrl().toString().replace("normal", "400x400"),
+        session.getAuthToken().token,
         firebaseUser.getUid(),
         firebaseUser.getProviderId());
 
@@ -98,6 +94,5 @@ public class MainActivityViewModel extends AndroidViewModel {
       }
     });
   }
-
 
 }

@@ -13,12 +13,24 @@ import android.view.inputmethod.InputMethodManager;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Base64;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class UtilsClass {
@@ -135,6 +147,64 @@ public class UtilsClass {
       e.printStackTrace();
     }
     return "";
+  }
+
+  private SecretKey sSecretKey;
+  private IvParameterSpec sIvParameterSpec;
+
+  public SecretKey getsSecretKey() {
+    return sSecretKey;
+  }
+
+  public IvParameterSpec getsIvParameterSpec() {
+    return sIvParameterSpec;
+  }
+
+  public SecretKey generateKey(String password, String salt)
+      throws NoSuchAlgorithmException, InvalidKeySpecException {
+    if(sSecretKey != null) {
+      return sSecretKey;
+    }
+    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+    KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 500, 256);
+    SecretKey secret = new SecretKeySpec(factory.generateSecret(spec)
+        .getEncoded(), "AES");
+    sSecretKey = secret;
+    return secret;
+  }
+
+  public IvParameterSpec generateIv() {
+    if(sIvParameterSpec != null) {
+      return sIvParameterSpec;
+    }
+    byte[] iv = new byte[16];
+    new SecureRandom().nextBytes(iv);
+    sIvParameterSpec = new IvParameterSpec(iv);
+    return sIvParameterSpec;
+  }
+
+  public String encrypt(String input, SecretKey key,
+                         IvParameterSpec iv) throws NoSuchPaddingException, NoSuchAlgorithmException,
+      InvalidAlgorithmParameterException, InvalidKeyException,
+      BadPaddingException, IllegalBlockSizeException {
+
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+    byte[] cipherText = cipher.doFinal(input.getBytes());
+    return Base64.getEncoder()
+        .encodeToString(cipherText);
+  }
+
+  public String decrypt(String cipherText, SecretKey key,
+                         IvParameterSpec iv) throws NoSuchPaddingException, NoSuchAlgorithmException,
+      InvalidAlgorithmParameterException, InvalidKeyException,
+      BadPaddingException, IllegalBlockSizeException {
+
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.DECRYPT_MODE, key, iv);
+    byte[] plainText = cipher.doFinal(Base64.getDecoder()
+        .decode(cipherText));
+    return new String(plainText);
   }
 
 }

@@ -1,11 +1,14 @@
 package pt.rfernandes.bubbletweet.data;
 
+import android.app.Activity;
 import android.app.Application;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import pt.rfernandes.bubbletweet.R;
@@ -17,6 +20,7 @@ import pt.rfernandes.bubbletweet.data.remote.RequestCallBack;
 import pt.rfernandes.bubbletweet.data.remote.RequestService;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.TweetBody;
+import pt.rfernandes.bubbletweet.model.TweetCreds;
 import pt.rfernandes.bubbletweet.model.TweetErrors;
 import pt.rfernandes.bubbletweet.model.TweetResponse;
 import retrofit2.Call;
@@ -86,7 +90,7 @@ public class Repository {
 
   public void sendTweet(TweetBody tweetBody, RequestCallBack requestCallBack) {
     this.mRequestService = DataSource.getRequestService(tweetBody.getOauth_consumer_key(),
-        Constants.SECRET,
+        Constants.sTweetCreds.getTweetConsumerSecret(),
         tweetBody.getOauth_token(), tweetBody.getSecret());
 
     Call<TweetResponse> call = mRequestService.sendTweet(tweetBody.getOauth_version(),
@@ -121,6 +125,28 @@ public class Repository {
       }
     });
 
+  }
+
+  public void setTweetCreds(Activity activity, TweetCreds tweetCreds,
+                            DBCallBack<Boolean> callBack) {
+    new Thread(() -> {
+      appDatabase.getTemplateDAO().deleteTweetCreds();
+      appDatabase.getTemplateDAO().insertTweetCreds(tweetCreds);
+      activity.runOnUiThread(() -> callBack.returnDB(true));
+    }).start();
+  }
+
+  public void getTweetCreds(DBCallBack<TweetCreds> callBack) {
+    new Thread(() -> {
+      List<TweetCreds> tweetCredsList = appDatabase.getTemplateDAO().getTweetCreds();
+
+        if(tweetCredsList.size() > 0) {
+          callBack.returnDB(tweetCredsList.get(0));
+        } else {
+          callBack.returnDB(null);
+        }
+
+    }).start();
   }
 
 }

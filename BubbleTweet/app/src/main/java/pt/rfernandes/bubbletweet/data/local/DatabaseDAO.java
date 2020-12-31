@@ -6,6 +6,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import pt.rfernandes.bubbletweet.model.CustomUser;
+import pt.rfernandes.bubbletweet.model.TweetCreds;
 
 @Dao
 public interface DatabaseDAO {
@@ -27,5 +28,14 @@ public interface DatabaseDAO {
 
   @Query("SELECT * FROM CustomUser")
   List<CustomUser> getUser();
+
+  @Query("SELECT * FROM TweetCreds")
+  List<TweetCreds> getTweetCreds();
+
+  @Insert
+  void insertTweetCreds(TweetCreds tweetCreds);
+
+  @Query("DELETE FROM TweetCreds")
+  void deleteTweetCreds();
 
 }

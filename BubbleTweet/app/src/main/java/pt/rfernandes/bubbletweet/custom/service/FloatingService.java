@@ -1,17 +1,25 @@
 package pt.rfernandes.bubbletweet.custom.service;
 
+import android.app.AlertDialog;
 import android.app.Service;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.text.InputType;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -21,22 +29,29 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.Nullable;
 import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.Repository;
+import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import pt.rfernandes.bubbletweet.data.remote.RequestCallBack;
+import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.TweetBody;
+import pt.rfernandes.bubbletweet.model.TweetCreds;
 import pt.rfernandes.bubbletweet.ui.activities.MainActivity;
 import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
+
+import static pt.rfernandes.bubbletweet.custom.Constants.MAX_LENGTH_MENTION;
+import static pt.rfernandes.bubbletweet.custom.Constants.MAX_LENGTH_NO_MENTION;
 
 public class FloatingService extends Service implements
     View.OnTouchListener {
 
-  private final static float CLICK_DRAG_TOLERANCE = 15; // Often, there will be a slight,
+  private final static float CLICK_DRAG_TOLERANCE = 25; // Often, there will be a slight,
   // unintentional, drag when the user taps the FAB, so we need to account for this.
   private float downRawX, downRawY;
 
@@ -67,7 +82,12 @@ public class FloatingService extends Service implements
   private float initialTouchX = 0;
   private float initialTouchY = 0;
   private boolean wasOpen = false;
-
+  private boolean showEnding = false;
+  private ImageButton imageButtonDiscard;
+  private TextInputLayout textInputLayoutLeft;
+  private TextInputLayout textInputLayoutRight;
+  private int maxTweetLength = 0;
+  private Vibrator myVib;
 
   @Nullable
   @Override
@@ -84,7 +104,7 @@ public class FloatingService extends Service implements
     display.getSize(size);
     width = size.x;
     height = size.y;
-
+    myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
     //Inflate the floating view layout we created
     mFloatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
     r1 = mFloatingView.findViewById(R.id.r1);
@@ -106,6 +126,15 @@ public class FloatingService extends Service implements
     imageButtonDefsRight = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDefsRight);
     textViewUserAtRight = (TextView) mFloatingView.findViewById(R.id.textViewUserAtRight);
     textViewUserAtLeft = (TextView) mFloatingView.findViewById(R.id.textViewUserAtLeft);
+    textInputLayoutRight = (TextInputLayout) mFloatingView.findViewById(R.id.textInputLayoutRight);
+    textInputLayoutLeft = (TextInputLayout) mFloatingView.findViewById(R.id.textInputLayoutLeft);
+//    imageButtonDiscard = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDiscard);
+    showEnding = SharedPreferencesManager.getInstance(getApplication()).getTweetEndingValue();
+
+    maxTweetLength = showEnding ? MAX_LENGTH_MENTION : MAX_LENGTH_NO_MENTION;
+
+    textInputLayoutLeft.setCounterMaxLength(maxTweetLength);
+    textInputLayoutRight.setCounterMaxLength(maxTweetLength);
 
     mRepository.getUserLoggedIn(user -> {
       textViewUserAtLeft.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
@@ -118,11 +147,17 @@ public class FloatingService extends Service implements
     imageButtonCancelRight.setOnClickListener(cancelClick);
     imageButtonCancelLeft.setOnClickListener(cancelClick);
 
+    editTextTextLeft.setImeOptions(EditorInfo.IME_ACTION_SEND);
+    editTextTextLeft.setRawInputType(InputType.TYPE_CLASS_TEXT);
+    editTextTextRight.setImeOptions(EditorInfo.IME_ACTION_SEND);
+    editTextTextRight.setRawInputType(InputType.TYPE_CLASS_TEXT);
+    editTextTextLeft.setOnEditorActionListener(mOnEditorActionListener);
+    editTextTextRight.setOnEditorActionListener(mOnEditorActionListener);
+
     mainButton.setOnClickListener(mainButtonClick);
 
     buttonLeft.setOnClickListener(sendTweetClick);
     buttonRight.setOnClickListener(sendTweetClick);
-//    btnClose.setOnClickListener(this);
 
     //Drag and move floating view using user's touch action.
     mainButton.setOnTouchListener(this);
@@ -147,14 +182,12 @@ public class FloatingService extends Service implements
     return params;
   }
 
-  private final View.OnTouchListener editTextTouchListener = new View.OnTouchListener() {
+  private final TextView.OnEditorActionListener mOnEditorActionListener = new TextView.OnEditorActionListener() {
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-      if (event.getAction() == MotionEvent.ACTION_UP) {
-        enableKeyboard();
-      }
-      if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS) {
-        v.performClick();
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+      if(actionId == EditorInfo.IME_ACTION_SEND) {
+        sendTweetClick.onClick(v);
+        return true;
       }
       return false;
     }
@@ -183,13 +216,17 @@ public class FloatingService extends Service implements
         if (Constants.ADS_DEBUGGER) {
           startAds();
         } else {
-          if (tweetContent.length() > 280) {
-            showMessage(getString(R.string.tweet_too_big));
+          if (tweetContent.length() > maxTweetLength) {
+            showMessage(getString(R.string.tweet_too_big, maxTweetLength));
             disableKeyboard();
           } else {
             if (SharedPreferencesManager.getInstance(getApplication()).getAvailableTokens() == 0) {
               startAds();
             } else {
+              if (showEnding) {
+                tweetContent =
+                    tweetContent + getResources().getString(R.string.tweet_sent_from_bubble);
+              }
               sendTweet(tweetContent);
             }
           }
@@ -211,6 +248,18 @@ public class FloatingService extends Service implements
       editTextTextLeft.setText("");
       editTextTextRight.setText("");
       toggleTweetWindow();
+      AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getApplicationContext())
+          .setMessage("Do you want to discard the Bubble?")
+          .setPositiveButton("Yes", (dialog, which) -> {
+            dialog.dismiss();
+            FloatingService.this.stopSelf();
+          })
+          .setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+          });
+      AlertDialog alertDialog = alertBuilder.create();
+      alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+      alertDialog.show();
     }
   };
 
@@ -254,11 +303,10 @@ public class FloatingService extends Service implements
   }
 
   private void sendTweet(String status) {
-    mRepository.getUserLoggedIn(object -> {
-
+    mRepository.getUserLoggedIn(object -> mRepository.getTweetCreds(credsObbject -> {
       TweetBody tweetBody =
-          new TweetBody(Constants.KEY,
-              Constants.SECRET,
+          new TweetBody(credsObbject.getTweetConsumerKey(),
+              credsObbject.getTweetConsumerSecret(),
               object.getToken(), status, object.getUserSecret());
 
       mRepository.sendTweet(tweetBody, new RequestCallBack() {
@@ -267,12 +315,7 @@ public class FloatingService extends Service implements
           int availableTokens =
               SharedPreferencesManager.getInstance(getApplication()).getAvailableTokens();
           SharedPreferencesManager.getInstance(getApplication()).setTokenKey(availableTokens - 1);
-          new Handler(getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-              showMessage(getString(R.string.tweet_success));
-            }
-          });
+          new Handler(getMainLooper()).post(() -> showMessage(getString(R.string.tweet_success)));
         }
 
         @Override
@@ -281,7 +324,7 @@ public class FloatingService extends Service implements
           new Handler(getMainLooper()).post(() -> showMessage(error));
         }
       });
-    });
+    }));
   }
 
   @Override
@@ -325,10 +368,10 @@ public class FloatingService extends Service implements
         mWindowManager.updateViewLayout(mFloatingView, params);
 
         showLinRight.setVisibility(View.GONE);
-        showLinLeft.setVisibility(View.GONE);
 
         return true;
       case MotionEvent.ACTION_UP:
+
         float upRawX = motionEvent.getRawX();
         float upRawY = motionEvent.getRawY();
 
@@ -338,6 +381,7 @@ public class FloatingService extends Service implements
         if (Math.abs(upDX) < CLICK_DRAG_TOLERANCE && Math.abs(upDY) < CLICK_DRAG_TOLERANCE) {
           // Click event has occurred
           view.performClick();
+          myVib.vibrate(VibrationEffect.createOneShot(25, VibrationEffect.EFFECT_TICK));
         } else {
 
           RelativeLayout.LayoutParams lp =
@@ -384,5 +428,27 @@ public class FloatingService extends Service implements
     mWindowManager.updateViewLayout(mFloatingView, params);
     UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, false);
   }
+
+//  private boolean isViewOverlapping(View firstView, View secondView) {
+//    if (firstView != null && secondView != null) {
+//      int[] firstPosition = new int[2];
+//      int[] secondPosition = new int[2];
+//
+//      firstView.getLocationOnScreen(firstPosition);
+//      secondView.getLocationOnScreen(secondPosition);
+//
+//      // Rect constructor parameters: left, top, right, bottom
+//      Rect rectFirstView = new Rect(firstPosition[0], firstPosition[1],
+//          firstPosition[0] + firstView.getMeasuredWidth(), firstPosition[1] + firstView.getMeasuredHeight());
+//      Rect rectSecondView = new Rect(secondPosition[0], secondPosition[1],
+//          secondPosition[0] + secondView.getMeasuredWidth(), secondPosition[1] + secondView.getMeasuredHeight());
+//      return rectFirstView.intersect(rectSecondView);
+//
+//    } else {
+//
+//      return false;
+//    }
+//
+//  }
 
 }
