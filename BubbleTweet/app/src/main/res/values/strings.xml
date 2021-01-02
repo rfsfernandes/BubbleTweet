@@ -35,4 +35,11 @@
   <string name="tweet_sent_from_bubble" translatable="false">&#160;-&#160;Tweet sent from BubbleTweet</string>
   <string name="get_twitter">get twitter</string>
   <string name="login_failed_no_app">Login failed. Looks like you don\'t have twitter installed.</string>
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
+  <string name="discard_bubble_question">Do you want to discard the Bubble?</string>
+  <string name="overlay_granted">Overlay Permission Granted :)</string>
+  <string name="overlay_denied">Overlay Permission Denied :(</string>
+  <string name="watch_ad_please">To use this functionality, please watch the ad until the
+    end.</string>
 </resources>

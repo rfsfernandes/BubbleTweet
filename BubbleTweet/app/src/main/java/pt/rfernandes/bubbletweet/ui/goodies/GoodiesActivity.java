@@ -27,6 +27,7 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.Collections;
 
+import androidx.work.WorkInfo;
 import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.service.FloatingService;
@@ -35,15 +36,22 @@ import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import static pt.rfernandes.bubbletweet.custom.utils.UtilsClass.md5;
 
 public class GoodiesActivity extends AppCompatActivity {
+  public static final String FROM_MAIN_LOGIN = "FROM_MAIN_LOGIN";
   private RewardedAd rewardedGoodie;
   private ProgressBar progressBar2;
+  private boolean fromMainLogin;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_goodies);
 
-
+    if (getIntent().getExtras() != null) {
+      Bundle bundle = getIntent().getExtras();
+      if(bundle.get(FROM_MAIN_LOGIN) != null) {
+        fromMainLogin = bundle.getBoolean(FROM_MAIN_LOGIN);
+      }
+    }
 //    MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
     if (Constants.APP_DEBUG) {
       String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -75,7 +83,7 @@ public class GoodiesActivity extends AppCompatActivity {
               // Ad closed.
               Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.sorry_ads),
                   Toast.LENGTH_SHORT).show();
-              resumeService();
+              resumeService(true, true);
             }
 
 
@@ -91,7 +99,7 @@ public class GoodiesActivity extends AppCompatActivity {
             public void onRewardedAdFailedToShow(AdError adError) {
               // Ad failed to display.
               Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.no_ads_to_show), Toast.LENGTH_SHORT).show();
-              resumeService();
+              resumeService(false, true);
             }
           };
           rewardedGoodie.show(activityContext, adCallback);
@@ -102,7 +110,7 @@ public class GoodiesActivity extends AppCompatActivity {
       public void onRewardedAdFailedToLoad(LoadAdError adError) {
         // Ad failed to load.
         Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.no_ads_to_show), Toast.LENGTH_SHORT).show();
-        resumeService();
+        resumeService(false, false);
       }
     };
 
@@ -110,10 +118,11 @@ public class GoodiesActivity extends AppCompatActivity {
 
   }
 
-  private void resumeService(){
+  private void resumeService(boolean success, boolean loaded){
+    setResult(loaded ? (success ? RESULT_OK : RESULT_CANCELED) : RESULT_OK);
     finish();
     progressBar2.setVisibility(View.GONE);
-    if (Settings.canDrawOverlays(GoodiesActivity.this)) {
+    if (Settings.canDrawOverlays(GoodiesActivity.this) && fromMainLogin) {
       // Permission was already granted..starting service for creating the Floating Button UI...
       startService(new Intent(GoodiesActivity.this, FloatingService.class));
     }

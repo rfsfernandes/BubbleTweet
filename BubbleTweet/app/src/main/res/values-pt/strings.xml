@@ -22,4 +22,11 @@
   <string name="mention_bubbletweet_in_the_end_of_my_tweets">Mencionar BubbleTweet no fim dos meus tweets</string>
   <string name="get_twitter">obter twitter</string>
   <string name="login_failed_no_app">Login falhado. Parece que não tem o twitter instalado.</string>
+  <string name="yes">Sim</string>
+  <string name="no">Não</string>
+  <string name="discard_bubble_question">Quer desativar a Bubble?</string>
+  <string name="overlay_granted">Permissão concedida :)</string>
+  <string name="overlay_denied">Permissão negada :(</string>
+  <string name="watch_ad_please">Para utilizar esta funcionalidade, por favor assista ao anúncio
+    até ao fim.</string>
 </resources>

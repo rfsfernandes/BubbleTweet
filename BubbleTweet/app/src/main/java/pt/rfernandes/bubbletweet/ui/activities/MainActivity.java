@@ -38,10 +38,14 @@ import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.viewmodels.MainActivityViewModel;
+import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
+
+import static pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity.FROM_MAIN_LOGIN;
 
 public class MainActivity extends AppCompatActivity {
 
   private static final int APP_OVERLAY_PERMISSION = 1000;
+  private static final int ADS_LOGIN = 656;
   private Context context;
   private MainActivityViewModel mMainActivityViewModel;
   private CircleImageView imageView;
@@ -53,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
   private FirebaseAuth mFirebaseAuth;
   private LinearLayout linearLayoutUserInfo;
   private ProgressBar progressBar;
-
+  private TwitterSession mTwitterSession;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -100,14 +104,14 @@ public class MainActivity extends AppCompatActivity {
     context = this;
 
     mTwitterBtn.setOnClickListener(v -> progressBar.setVisibility(View.VISIBLE));
+
     mTwitterBtn.setCallback(new Callback<TwitterSession>() {
       @Override
       public void success(Result<TwitterSession> result) {
-
-        Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
-            getResources().getString(R.string.signed_in_success), Snackbar.LENGTH_LONG).show();
-
-        signInToFirebaseWithTwitterSession(result.data);
+        mTwitterSession = result.data;
+        Intent intent = new Intent(MainActivity.this, GoodiesActivity.class);
+        intent.putExtra(FROM_MAIN_LOGIN, true);
+        startActivityForResult(intent, ADS_LOGIN);
 
         mTwitterBtn.setVisibility(View.VISIBLE);
       }
@@ -164,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     mFirebaseAuth.signInWithCredential(credential)
         .addOnCompleteListener(this, task -> {
           if (!task.isSuccessful()) {
+            progressBar.setVisibility(View.GONE);
             Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
                 getString(R.string.error_occurred), Snackbar.LENGTH_LONG).show();
           } else {
@@ -230,10 +235,24 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == APP_OVERLAY_PERMISSION) {
-      showMessage(checkIfOverlayPermissionGranted() ? "Overlay Permission Granted :)" : "Overlay Permission Denied :(");
-      startService(new Intent(context, FloatingService.class));
-      finish();
-    } else {
+      showMessage(checkIfOverlayPermissionGranted() ? getString(R.string.overlay_granted) : getString(R.string.overlay_denied));
+      if (Settings.canDrawOverlays(context)) {
+        startService(new Intent(context, FloatingService.class));
+        finish();
+      }
+      
+    } else if( requestCode == ADS_LOGIN){
+      if(resultCode == RESULT_OK){
+
+        Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
+            getResources().getString(R.string.signed_in_success), Snackbar.LENGTH_LONG).show();
+
+        signInToFirebaseWithTwitterSession(mTwitterSession);
+      } else {
+        Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
+            getString(R.string.watch_ad_please), Snackbar.LENGTH_LONG).show();
+      }
+    }else {
       super.onActivityResult(requestCode, resultCode, data);
       mTwitterBtn.onActivityResult(requestCode, resultCode, data);
     }

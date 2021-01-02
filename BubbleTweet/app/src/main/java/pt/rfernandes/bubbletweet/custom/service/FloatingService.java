@@ -137,8 +137,11 @@ public class FloatingService extends Service implements
     textInputLayoutRight.setCounterMaxLength(maxTweetLength);
 
     mRepository.getUserLoggedIn(user -> {
-      textViewUserAtLeft.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
-      textViewUserAtRight.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
+      if(user != null) {
+        textViewUserAtLeft.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
+        textViewUserAtRight.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
+      }
+
     });
 
     imageButtonDefsLeft.setOnClickListener(defsClick);
@@ -249,12 +252,12 @@ public class FloatingService extends Service implements
       editTextTextRight.setText("");
       toggleTweetWindow();
       AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getApplicationContext())
-          .setMessage("Do you want to discard the Bubble?")
-          .setPositiveButton("Yes", (dialog, which) -> {
+          .setMessage(getResources().getString(R.string.discard_bubble_question))
+          .setPositiveButton(getResources().getString(R.string.yes), (dialog, which) -> {
             dialog.dismiss();
             FloatingService.this.stopSelf();
           })
-          .setNegativeButton("No", (dialog, which) -> {
+          .setNegativeButton(getResources().getString(R.string.no), (dialog, which) -> {
             dialog.dismiss();
           });
       AlertDialog alertDialog = alertBuilder.create();
@@ -265,6 +268,7 @@ public class FloatingService extends Service implements
 
   private final View.OnClickListener defsClick = v -> {
     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     startActivity(intent);
     toggleTweetWindow();
     FloatingService.this.stopSelf();
