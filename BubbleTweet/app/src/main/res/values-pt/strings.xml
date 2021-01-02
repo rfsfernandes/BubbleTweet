@@ -6,7 +6,7 @@
   <string name="write_your_tweet">Escreva o seu tweet</string>
   <string name="tweet_something">Tweeta alguma coisa…</string>
   <string name="tweet_success">Tweet enviado com sucesso.</string>
-  <string name="login_failed">Login falhado. Não tem internet ou aplicação do Twitter não encontra no seu telemóvel.</string>
+  <string name="login_failed">Login falhado. Por favor tente novamente.</string>
   <string name="signed_in_success">Login no twitter com sucesso</string>
   <string name="error_occurred">Ocorreu um erro. Tente novamente mais tarde.</string>
   <string name="logout">sair</string>
@@ -20,4 +20,6 @@
   <string name="please_consider_enabling_it_thank_you">Por favor considere ativar esta funcionalidade.</string>
   <string name="enabling_this_feature_will_help_bubbletweet_reach_more_people_it_would_help_us_a_lot">Ao ativar esta funcionalidade irá estar a ajudar o BubbleTweet a chegar a mais pessoas. Seria uma grande ajuda para nós!</string>
   <string name="mention_bubbletweet_in_the_end_of_my_tweets">Mencionar BubbleTweet no fim dos meus tweets</string>
+  <string name="get_twitter">obter twitter</string>
+  <string name="login_failed_no_app">Login falhado. Parece que não tem o twitter instalado.</string>
 </resources>

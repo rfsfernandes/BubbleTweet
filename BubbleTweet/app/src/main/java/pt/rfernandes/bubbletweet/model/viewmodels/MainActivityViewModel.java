@@ -54,21 +54,6 @@ public class MainActivityViewModel extends AndroidViewModel {
     mRepository.getUserLoggedIn(object -> mFirebaseUserMutableLiveData.postValue(object));
   }
 
-  private String assetFiletoString(InputStream is) throws IOException {
-    StringBuilder buf = new StringBuilder();
-    BufferedReader in =
-        new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-    String str;
-
-    while ((str = in.readLine()) != null) {
-      buf.append(str);
-    }
-
-    in.close();
-
-    return buf.toString();
-  }
-
   private void setLoggedInUser(TwitterSession session, FirebaseUser firebaseUser) {
     CustomUser customUser = new CustomUser(session.getUserId(), session.getUserName(),
         session.getAuthToken().secret,

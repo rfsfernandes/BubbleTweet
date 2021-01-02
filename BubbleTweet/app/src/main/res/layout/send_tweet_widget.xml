@@ -1,24 +1,40 @@
-<RelativeLayout android:id="@+id/widget_layout"
+<LinearLayout android:id="@+id/widget_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/appWidgetBackgroundColor"
+    android:background="@color/white"
     android:padding="@dimen/widget_margin"
     android:theme="@style/ThemeOverlay.TweetSender.AppWidgetContainer">
 
-  <TextView
-      android:id="@+id/appwidget_text"
-      android:layout_width="wrap_content"
+  <LinearLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_centerInParent="true"
-      android:layout_marginBottom="8dp"
-      android:layout_marginEnd="8dp"
-      android:layout_marginStart="8dp"
-      android:layout_marginTop="8dp"
-      android:background="?attr/appWidgetBackgroundColor"
-      android:contentDescription="@string/activate_bubble"
-      android:text="@string/activate_bubble"
-      android:textColor="?attr/appWidgetTextColor"
-      android:textSize="24sp"
-      android:textStyle="bold|italic" />
-</RelativeLayout>
+      android:gravity="center"
+      android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/icon_app" />
+
+    <TextView
+        android:id="@+id/appwidget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/activate_bubble"
+        android:gravity="center"
+        android:text="@string/activate_bubble"
+        android:textColor="@color/colorAccent"
+        android:textSize="24sp"
+        android:textStyle="bold|italic" />
+  </LinearLayout>
+
+</LinearLayout>

@@ -3,14 +3,19 @@ package pt.rfernandes.bubbletweet.ui.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.Repository;
 import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.model.TweetCreds;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -28,8 +33,22 @@ public class SplashActivity extends AppCompatActivity {
   private Activity mActivity;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      final WindowInsetsController controller = getWindow().getInsetsController();
+
+      if (controller != null)
+        controller.hide(WindowInsets.Type.statusBars());
+    }
+    else {
+      //noinspection deprecation
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+          WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+    setTheme(UtilsClass.getInstance().setStatusBarDark(this));
     super.onCreate(savedInstanceState);
+
     setContentView(R.layout.activity_splash);
+
     mRepository = Repository.getInstance(getApplication());
     mDatabaseReference = FirebaseDatabase.getInstance().getReference()
         .child("ttkeys");

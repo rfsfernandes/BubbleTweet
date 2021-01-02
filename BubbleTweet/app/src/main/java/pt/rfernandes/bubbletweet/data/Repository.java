@@ -53,16 +53,13 @@ public class Repository {
   }
 
   public void getUserLoggedIn(DBCallBack<CustomUser> callBack) {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        if (appDatabase.getTemplateDAO().getUser() != null && appDatabase.getTemplateDAO().getUser().size() > 0) {
-          callBack.returnDB(appDatabase.getTemplateDAO().getUser().get(0));
-        } else {
-          callBack.returnDB(null);
-        }
-
+    new Thread(() -> {
+      if (appDatabase.getTemplateDAO().getUser() != null && appDatabase.getTemplateDAO().getUser().size() > 0) {
+        callBack.returnDB(appDatabase.getTemplateDAO().getUser().get(0));
+      } else {
+        callBack.returnDB(null);
       }
+
     }).start();
 
   }

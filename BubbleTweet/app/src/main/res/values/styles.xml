@@ -8,6 +8,24 @@
     <item name="colorAccent">@color/colorAccent</item>
   </style>
 
+  <style name="NightTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:statusBarColor">@color/transparent</item>
+    <item name="android:windowLightStatusBar">false</item>
+  </style>
+
+  <style name="DayTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:statusBarColor">@color/transparent</item>
+    <item name="android:windowLightStatusBar">true</item>
+  </style>
+
   <style name="SendButtonTheme">
     <item name="background">@drawable/send_button_background</item>
     <item name="android:textColor">@color/white</item>

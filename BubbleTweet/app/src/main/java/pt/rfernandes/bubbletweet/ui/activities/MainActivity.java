@@ -2,11 +2,9 @@ package pt.rfernandes.bubbletweet.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -15,19 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.TwitterAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.Twitter;
@@ -37,7 +27,6 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -45,14 +34,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.service.FloatingService;
+import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import pt.rfernandes.bubbletweet.model.CustomUser;
-import pt.rfernandes.bubbletweet.model.TweetCreds;
-import pt.rfernandes.bubbletweet.model.viewmodels.FirebaseRTDBCallBack;
 import pt.rfernandes.bubbletweet.model.viewmodels.MainActivityViewModel;
-
-import static pt.rfernandes.bubbletweet.custom.Constants.FROM_DEFS;
-import static pt.rfernandes.bubbletweet.custom.Constants.FROM_WIDGET;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,17 +57,19 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    setTheme(UtilsClass.getInstance().setStatusBarDark(this));
     super.onCreate(savedInstanceState);
 
     mMainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-    TwitterAuthConfig mTwitterAuthConfig = new TwitterAuthConfig(Constants.sTweetCreds.getTweetConsumerKey(),
-        Constants.sTweetCreds.getTweetConsumerSecret());
-    TwitterConfig twitterConfig = new TwitterConfig.Builder(MainActivity.this)
-        .twitterAuthConfig(mTwitterAuthConfig)
-        .debug(Constants.TW_DEBUGGER)
-        .build();
-    Twitter.initialize(twitterConfig);
-
+    if (Constants.sTweetCreds != null) {
+      TwitterAuthConfig mTwitterAuthConfig = new TwitterAuthConfig(Constants.sTweetCreds.getTweetConsumerKey(),
+          Constants.sTweetCreds.getTweetConsumerSecret());
+      TwitterConfig twitterConfig = new TwitterConfig.Builder(MainActivity.this)
+          .twitterAuthConfig(mTwitterAuthConfig)
+          .debug(Constants.TW_DEBUGGER)
+          .build();
+      Twitter.initialize(twitterConfig);
+    }
     setContentView(R.layout.activity_main);
     initViewModel();
     mMainActivityViewModel.getLoggedInUser();
@@ -112,19 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     context = this;
 
-
-    // Asking for permission from user...
-    if (!Settings.canDrawOverlays(context)) {
-      Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-      startActivityForResult(intent, APP_OVERLAY_PERMISSION);
-    }
-
-    mTwitterBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        progressBar.setVisibility(View.VISIBLE);
-      }
-    });
+    mTwitterBtn.setOnClickListener(v -> progressBar.setVisibility(View.VISIBLE));
     mTwitterBtn.setCallback(new Callback<TwitterSession>() {
       @Override
       public void success(Result<TwitterSession> result) {
@@ -139,24 +114,44 @@ public class MainActivity extends AppCompatActivity {
 
       @Override
       public void failure(TwitterException exception) {
-        Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
-            getResources().getString(R.string.login_failed), Snackbar.LENGTH_LONG).show();
+        Snackbar snackbar = Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
+            getResources().getString(R.string.login_failed), Snackbar.LENGTH_LONG);
+        if (exception.getMessage() != null && exception.getMessage().contains("Failed to get " +
+            "request token")) {
+          snackbar = Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
+              getResources().getString(R.string.login_failed), Snackbar.LENGTH_LONG);
+          snackbar.setAction(R.string.get_twitter, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              Intent intent = new Intent(Intent.ACTION_VIEW);
+              intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.twitter.android&hl=pt_PT&gl=US"));
+              startActivity(intent);
+            }
+          });
+        }
+
+        snackbar.show();
+
       }
     });
 
     mTwitterBtn.setVisibility(checkIfOverlayPermissionGranted() ? View.VISIBLE : View.GONE);
 
     buttonActivateService.setOnClickListener(v -> {
-      startService(new Intent(context, FloatingService.class));
-      finish();
+      // Asking for permission from user...
+      if (!Settings.canDrawOverlays(context)) {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+        startActivityForResult(intent, APP_OVERLAY_PERMISSION);
+      } else {
+        startService(new Intent(context, FloatingService.class));
+        finish();
+      }
+
     });
 
-    buttonLogout.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        progressBar.setVisibility(View.VISIBLE);
-        mMainActivityViewModel.logout();
-      }
+    buttonLogout.setOnClickListener(v -> {
+      progressBar.setVisibility(View.VISIBLE);
+      mMainActivityViewModel.logout();
     });
 
   }
@@ -165,21 +160,14 @@ public class MainActivity extends AppCompatActivity {
     AuthCredential credential = TwitterAuthProvider.getCredential(session.getAuthToken().token,
         session.getAuthToken().secret);
 
-
     mFirebaseAuth.signInWithCredential(credential)
-        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-          @Override
-          public void onComplete(@NonNull Task<AuthResult> task) {
-            if (!task.isSuccessful()) {
-              Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
-                  getString(R.string.error_occurred), Snackbar.LENGTH_LONG).show();
-            } else {
-              if (Settings.canDrawOverlays(context)) {
-                // Permission was already granted..starting service for creating the Floating Button UI...
-                if (task.getResult() != null) {
-                  mMainActivityViewModel.authTwitter(session, task.getResult().getUser());
-                }
-              }
+        .addOnCompleteListener(this, task -> {
+          if (!task.isSuccessful()) {
+            Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
+                getString(R.string.error_occurred), Snackbar.LENGTH_LONG).show();
+          } else {
+            if (task.getResult() != null) {
+              mMainActivityViewModel.authTwitter(session, task.getResult().getUser());
             }
           }
         });
@@ -197,41 +185,17 @@ public class MainActivity extends AppCompatActivity {
     });
 
     mMainActivityViewModel.mFirebaseUserMutableLiveData.observe(this, firebaseUser -> {
-      if(firebaseUser != null) {
-
-        if(getIntent().getExtras() != null) {
-          Bundle extras = getIntent().getExtras();
-          if(extras != null) {
-            boolean fromWidget = extras.getBoolean(FROM_WIDGET);
-            boolean fromDefs = extras.getBoolean(FROM_DEFS);
-            if(fromWidget) {
-             startService();
-            } else if(fromDefs) {
-
-              if (firebaseUser != null) {
-                setViews(firebaseUser, true);
-              } else {
-                setViews(null, false);
-              }
-
-            } else {
-              startService();
-            }
-          }
-        } else {
-          if (firebaseUser != null) {
-            setViews(firebaseUser, true);
-          } else {
-            setViews(null, false);
-          }
-        }
+      if (firebaseUser != null) {
+        setViews(firebaseUser, true);
+      } else {
+        setViews(null, false);
       }
 
     });
 
   }
 
-  private void startService(){
+  private void startService() {
     startService(new Intent(context, FloatingService.class));
     finish();
   }
@@ -266,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == APP_OVERLAY_PERMISSION) {
       showMessage(checkIfOverlayPermissionGranted() ? "Overlay Permission Granted :)" : "Overlay Permission Denied :(");
-      findViewById(R.id.createBtn).setVisibility(checkIfOverlayPermissionGranted() ? View.VISIBLE : View.GONE);
+      startService(new Intent(context, FloatingService.class));
+      finish();
     } else {
       super.onActivityResult(requestCode, resultCode, data);
       mTwitterBtn.onActivityResult(requestCode, resultCode, data);

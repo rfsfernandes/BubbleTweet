@@ -7,7 +7,7 @@
   <string name="write_your_tweet">Write your tweet</string>
   <string name="tweet_something">Tweet something…</string>
   <string name="tweet_success">Tweet successfully sent.</string>
-  <string name="login_failed">Login failed. No internet or No Twitter app found on your phone.</string>
+  <string name="login_failed">Login failed. Please try again.</string>
   <string name="signed_in_success">Signed in to twitter successful</string>
   <string name="error_occurred">An error has occurred. Try again later.</string>
   <string name="logout">logout</string>
@@ -33,4 +33,6 @@
   <string name="enabling_this_feature_will_help_bubbletweet_reach_more_people_it_would_help_us_a_lot">Enabling this feature will help BubbleTweet reach more people. It would help us a lot!</string>
   <string name="mention_bubbletweet_in_the_end_of_my_tweets">Mention BubbleTweet in the end of my tweets</string>
   <string name="tweet_sent_from_bubble" translatable="false">&#160;-&#160;Tweet sent from BubbleTweet</string>
+  <string name="get_twitter">get twitter</string>
+  <string name="login_failed_no_app">Login failed. Looks like you don\'t have twitter installed.</string>
 </resources>

@@ -17,19 +17,18 @@
         android:id="@+id/showLinLeft"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:padding="10dp"
         android:layout_toEndOf="@+id/r1"
         android:gravity="center"
         android:orientation="vertical"
+        android:clipToPadding="false"
         android:visibility="gone">
 
       <androidx.cardview.widget.CardView
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          app:cardCornerRadius="8dp">
+          app:cardCornerRadius="8dp"
+          app:cardElevation="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -121,18 +120,17 @@
         android:id="@+id/showLinRight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:padding="10dp"
         android:layout_toStartOf="@+id/r1"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:clipToPadding="false">
 
       <androidx.cardview.widget.CardView
           android:layout_width="match_parent"
           android:layout_height="match_parent"
+          app:cardElevation="8dp"
           app:cardCornerRadius="8dp">
 
         <LinearLayout
@@ -227,15 +225,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/showLinLeft"
-        android:layout_marginTop="10dp"
-        android:gravity="center">
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:clipToPadding="false">
 
       <com.google.android.material.floatingactionbutton.FloatingActionButton
           android:id="@+id/mainButton"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_margin="5dp"
           android:background="@drawable/tweet_bubble_fab_background"
-          android:src="@drawable/tw__composer_logo_white" />
+          android:src="@drawable/ic_bubble_icon"
+          app:maxImageSize="35dp"
+          android:cropToPadding="false"/>
 
     </RelativeLayout>
 
