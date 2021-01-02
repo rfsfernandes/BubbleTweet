@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
       @Override
       public void failure(TwitterException exception) {
+        progressBar.setVisibility(View.GONE);
         Snackbar snackbar = Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
             getResources().getString(R.string.login_failed), Snackbar.LENGTH_LONG);
         if (exception.getMessage() != null && exception.getMessage().contains("Failed to get " +
