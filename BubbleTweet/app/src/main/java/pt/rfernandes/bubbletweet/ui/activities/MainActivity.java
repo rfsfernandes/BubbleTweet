@@ -1,10 +1,14 @@
 package pt.rfernandes.bubbletweet.ui.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -13,6 +17,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorChangedListener;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.flask.colorpicker.slider.AlphaSlider;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.AuthCredential;
@@ -28,7 +38,10 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
 import de.hdodenhof.circleimageview.CircleImageView;
 import pt.rfernandes.bubbletweet.R;
@@ -58,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
   private LinearLayout linearLayoutUserInfo;
   private ProgressBar progressBar;
   private TwitterSession mTwitterSession;
+  private AlertDialog colorPickerCustomDialog;
+  private CardView cardViewPickColor;
+  private SwitchMaterial switchMaterial;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +91,14 @@ public class MainActivity extends AppCompatActivity {
       Twitter.initialize(twitterConfig);
     }
     setContentView(R.layout.activity_main);
+    context = this;
+    createColorPickerDialog();
     initViewModel();
     mMainActivityViewModel.getLoggedInUser();
 
 
     mFirebaseAuth = FirebaseAuth.getInstance();
+    cardViewPickColor = findViewById(R.id.cardViewPickColor);
     imageView = findViewById(R.id.imageView);
     textViewDisplayName = findViewById(R.id.textViewDisplayName);
     textViewUsername = findViewById(R.id.textViewUsername);
@@ -88,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     linearLayoutUserInfo = findViewById(R.id.linearLayoutUserInfo);
     buttonLogout = findViewById(R.id.buttonLogout);
     progressBar = findViewById(R.id.progressBar);
-    SwitchMaterial switchMaterial = findViewById(R.id.switch1);
+    switchMaterial = findViewById(R.id.switch1);
     boolean toShowEnding = SharedPreferencesManager.getInstance(getApplication()).getTweetEndingValue();
     switchMaterial.setChecked(toShowEnding);
 
@@ -100,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
               .setTweetEndingValue(isChecked);
         }
     );
-
-    context = this;
 
     mTwitterBtn.setOnClickListener(v -> progressBar.setVisibility(View.VISIBLE));
 
@@ -159,6 +176,82 @@ public class MainActivity extends AppCompatActivity {
       mMainActivityViewModel.logout();
     });
 
+    cardViewPickColor.setOnClickListener(v -> {
+      colorPickerCustomDialog.show();
+    });
+
+  }
+
+  private void createColorPickerDialog() {
+    AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+    View colorPickerDialogView =
+        LayoutInflater.from(this).inflate(R.layout.color_picker_custom_dialog
+            , null);
+
+    alertDialog.setView(colorPickerDialogView);
+    Button buttonCancelColor = colorPickerDialogView.findViewById(R.id.buttonCancelColor);
+    Button buttonSelectColor = colorPickerDialogView.findViewById(R.id.buttonAcceptColor);
+    TextView textViewTitle = colorPickerDialogView.findViewById(R.id.textView3);
+    Button buttonReset = colorPickerDialogView.findViewById(R.id.buttonReset);
+    ColorPickerView colorPickerView = colorPickerDialogView.findViewById(R.id.color_picker_view);
+
+    final int[] mSelectedColor = {0};
+
+    colorPickerView.addOnColorChangedListener(selectedColor -> {
+      textViewTitle.setTextColor(selectedColor);
+      buttonCancelColor.setTextColor(selectedColor);
+      buttonSelectColor.setBackgroundColor(selectedColor);
+      mSelectedColor[0] = selectedColor;
+      buttonReset.setTextColor(selectedColor);
+    });
+
+    colorPickerCustomDialog = alertDialog.create();
+
+    buttonCancelColor.setOnClickListener(v -> colorPickerCustomDialog.dismiss());
+
+    buttonSelectColor.setOnClickListener(v -> {
+      if (mSelectedColor[0] != 0) {
+        mMainActivityViewModel.setColor(mSelectedColor[0]);
+      }
+
+      stopService(new Intent(context, FloatingService.class));
+      colorPickerCustomDialog.dismiss();
+
+    });
+
+    buttonReset.setOnClickListener(v -> {
+      textViewTitle.setTextColor(getColor(R.color.colorAccent));
+      buttonCancelColor.setTextColor(getColor(R.color.colorAccent));
+      buttonSelectColor.setBackgroundColor(getColor(R.color.colorAccent));
+      mSelectedColor[0] = getColor(R.color.colorAccent);
+      buttonReset.setTextColor(getColor(R.color.colorAccent));
+      mMainActivityViewModel.setColor(R.color.colorAccent);
+    });
+
+  }
+
+  private void colorViews(int color) {
+    buttonLogout.setTextColor(color);
+
+    DrawableCompat.setTintList(switchMaterial.getThumbDrawable(), new ColorStateList(
+        new int[][]{
+            new int[]{android.R.attr.state_checked},
+            new int[]{}
+        },
+        new int[]{
+            color,
+            Color.GRAY
+        }));
+
+    progressBar.getIndeterminateDrawable().setTint(color);
+    imageView.setBorderColor(color);
+    buttonActivateService.getBackground().setTint(color);
+    if(color == R.color.colorAccent) {
+      cardViewPickColor.setCardBackgroundColor(getColor(R.color.colorAccent));
+    } else {
+      cardViewPickColor.setCardBackgroundColor(color);
+    }
+
   }
 
   private void signInToFirebaseWithTwitterSession(TwitterSession session) {
@@ -197,6 +290,10 @@ public class MainActivity extends AppCompatActivity {
         setViews(null, false);
       }
 
+    });
+
+    mMainActivityViewModel.mColorMutableLiveData.observe(this, color -> {
+      colorViews(color);
     });
 
   }
@@ -240,9 +337,9 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent(context, FloatingService.class));
         finish();
       }
-      
-    } else if( requestCode == ADS_LOGIN){
-      if(resultCode == RESULT_OK){
+
+    } else if (requestCode == ADS_LOGIN) {
+      if (resultCode == RESULT_OK) {
 
         Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
             getResources().getString(R.string.signed_in_success), Snackbar.LENGTH_LONG).show();
@@ -252,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
         Snackbar.make(MainActivity.this, findViewById(android.R.id.content),
             getString(R.string.watch_ad_please), Snackbar.LENGTH_LONG).show();
       }
-    }else {
+    } else {
       super.onActivityResult(requestCode, resultCode, data);
       mTwitterBtn.onActivityResult(requestCode, resultCode, data);
     }

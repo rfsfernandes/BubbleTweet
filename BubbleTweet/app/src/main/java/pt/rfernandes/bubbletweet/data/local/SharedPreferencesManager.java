@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 import com.twitter.sdk.android.core.TwitterSession;
 
+import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 
 import static pt.rfernandes.bubbletweet.custom.Constants.TWEET_SPAN_TILL_AD;
@@ -17,6 +18,7 @@ public class SharedPreferencesManager {
   private static final String SHARED_PREFS = "SHARED_PREFS";
   private static final String TOKEN_KEY = "TOKEN:KEY";
   private static final String TWEET_ENDING_KEY = "TWEET_ENDING:KEY";
+  private static final String ACTIVE_COLOR = "ACTIVE_COLOR";
   private static SharedPreferencesManager instance;
   private static SharedPreferences sharedPrefs;
   private static SharedPreferences.Editor sharedPrefsEditor;
@@ -69,6 +71,24 @@ public class SharedPreferencesManager {
       sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
     return sharedPrefs.getBoolean(TWEET_ENDING_KEY, true);
+  }
+
+
+  public void setActiveColor(int color){
+    if (sharedPrefs == null || sharedPrefsEditor == null) {
+      sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+      sharedPrefsEditor = sharedPrefs.edit();
+
+    }
+    sharedPrefsEditor.putInt(ACTIVE_COLOR, color);
+    sharedPrefsEditor.apply();
+  }
+
+  public int getActiveColor() {
+    if (sharedPrefs == null) {
+      sharedPrefs = mApplication.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    }
+    return sharedPrefs.getInt(ACTIVE_COLOR, mApplication.getColor(R.color.colorAccent));
   }
 
 }

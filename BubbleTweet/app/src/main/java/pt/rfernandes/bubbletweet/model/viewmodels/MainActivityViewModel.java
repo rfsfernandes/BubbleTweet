@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData;
 import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.data.Repository;
 import pt.rfernandes.bubbletweet.data.local.DBCallBack;
+import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import pt.rfernandes.bubbletweet.model.CustomUser;
 
 
@@ -31,7 +32,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
   public MutableLiveData<CustomUser> authLiveData = new MutableLiveData<>();
   public MutableLiveData<CustomUser> mFirebaseUserMutableLiveData = new MutableLiveData<>();
-
+  public MutableLiveData<Integer> mColorMutableLiveData = new MutableLiveData<>();
 
   /**
    * This méthod creates a new instance of the ViewModel.
@@ -43,7 +44,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     super(application);
     this.mApplication = application;
     this.mRepository = Repository.getInstance(application);
-
+    mColorMutableLiveData.setValue(SharedPreferencesManager.getInstance(getApplication()).getActiveColor());
   }
 
   public void getTokens(FirebaseRTDBCallBack callBack){
@@ -78,6 +79,11 @@ public class MainActivityViewModel extends AndroidViewModel {
         authLiveData.postValue(null);
       }
     });
+  }
+
+  public void setColor(int color){
+    mColorMutableLiveData.setValue(color);
+    SharedPreferencesManager.getInstance(getApplication()).setActiveColor(color);
   }
 
 }

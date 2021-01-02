@@ -72,6 +72,6 @@ dependencies {
   implementation 'oauth.signpost:signpost-core:1.2.1.2'
 
   implementation "com.bugsnag:bugsnag-android:5.+"
-
+  implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
 }

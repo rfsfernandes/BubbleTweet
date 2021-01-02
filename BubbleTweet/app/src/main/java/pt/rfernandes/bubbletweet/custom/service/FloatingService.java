@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.VibrationEffect;
@@ -128,6 +130,7 @@ public class FloatingService extends Service implements
     textViewUserAtLeft = (TextView) mFloatingView.findViewById(R.id.textViewUserAtLeft);
     textInputLayoutRight = (TextInputLayout) mFloatingView.findViewById(R.id.textInputLayoutRight);
     textInputLayoutLeft = (TextInputLayout) mFloatingView.findViewById(R.id.textInputLayoutLeft);
+    tintViews(SharedPreferencesManager.getInstance(getApplication()).getActiveColor());
 //    imageButtonDiscard = (ImageButton) mFloatingView.findViewById(R.id.imageButtonDiscard);
     showEnding = SharedPreferencesManager.getInstance(getApplication()).getTweetEndingValue();
 
@@ -183,6 +186,35 @@ public class FloatingService extends Service implements
     params.y = 50;
 
     return params;
+  }
+
+  private void tintViews(int color){
+    int[][] states = new int[][] {
+        new int[] { android.R.attr.state_enabled},
+    };
+
+    int[] colors = new int[] {
+        color
+    };
+
+    ColorStateList myList = new ColorStateList(states, colors);
+    mainButton.setBackgroundTintList(myList);
+    buttonRight.getBackground().setTint(color);
+    buttonLeft.getBackground().setTint(color);
+    editTextTextRight.setHintTextColor(color);
+    editTextTextLeft.setHintTextColor(color);
+    imageButtonCancelLeft.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY);
+    imageButtonCancelRight.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY);
+    imageButtonDefsLeft.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY);
+    imageButtonDefsRight.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY);
+    textViewUserAtRight.setTextColor(color);
+    textViewUserAtLeft.setTextColor(color);
+
+    textInputLayoutRight.setHintTextColor(myList);
+    textInputLayoutLeft.setHintTextColor(myList);
+    textInputLayoutLeft.setCounterTextColor(myList);
+    textInputLayoutRight.setCounterTextColor(myList);
+
   }
 
   private final TextView.OnEditorActionListener mOnEditorActionListener = new TextView.OnEditorActionListener() {

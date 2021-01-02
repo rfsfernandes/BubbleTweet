@@ -209,6 +209,7 @@
                   android:layout_height="wrap_content"
                   android:hint="@string/tweet_something"
                   android:imeOptions="actionSend"
+                  android:textColorHint="@color/tw__composer_red"
                   android:inputType="textMultiLine|textCapSentences" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -234,7 +235,6 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_margin="5dp"
-          android:background="@drawable/tweet_bubble_fab_background"
           android:src="@drawable/ic_bubble_icon"
           app:maxImageSize="35dp"
           android:cropToPadding="false"/>

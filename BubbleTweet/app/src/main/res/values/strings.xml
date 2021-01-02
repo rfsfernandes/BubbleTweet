@@ -42,4 +42,5 @@
   <string name="overlay_denied">Overlay Permission Denied :(</string>
   <string name="watch_ad_please">To use this functionality, please watch the ad until the
     end.</string>
+  <string name="pick_color">pick</string>
 </resources>

@@ -7,6 +7,17 @@
     android:layout_height="match_parent">
 
 
+  <androidx.cardview.widget.CardView
+      android:id="@+id/cardViewPickColor"
+      android:layout_width="35dp"
+      android:layout_height="35dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
+      app:cardBackgroundColor="@color/colorAccent"
+      app:cardElevation="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
   <Button
       android:id="@+id/buttonActivateService"
       android:layout_width="wrap_content"
@@ -44,7 +55,7 @@
       android:layout_height="wrap_content"
       android:gravity="center"
       android:orientation="vertical"
-      android:visibility="gone"
+      android:visibility="visible"
       app:layout_constraintBottom_toTopOf="@+id/buttonActivateService"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +66,9 @@
         android:id="@+id/imageView"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        tools:src="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars"
+        app:civ_border_width="5dp"
+        app:civ_border_color="@color/colorAccent"/>
 
     <TextView
         android:id="@+id/textViewDisplayName"
@@ -87,7 +100,8 @@
           android:id="@+id/switch1"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/mention_bubbletweet_in_the_end_of_my_tweets" />
+          android:text="@string/mention_bubbletweet_in_the_end_of_my_tweets"
+          android:checked="true" />
 
       <TextView
           android:id="@+id/textView"
