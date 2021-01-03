@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">BubbleTweet</string>
+  <string name="app_name" translatable="false">BubbleT</string>
   <string name="add_widget">Add widget</string>
 
   <string name="empty_tweet">Can\'t send an empty tweet.</string>
@@ -24,6 +24,8 @@
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
   <string name="interstitial_ad_unit_id" translatable="false">ca-app-pub-5556364700570622/7508076897</string>
+  <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5556364700570622/8034490817</string>
+  <string name="banner_ad_unit_id_tests" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
   <string name="no_ads_to_show">No ads to show. Enjoy :)</string>
   <string name="thank_you_ad">Thank you for the patience!</string>
   <string name="sorry_ads">I\'m sorry, but I need to pay my bills. :(</string>
@@ -44,4 +46,5 @@
   <string name="watch_ad_please">To use this functionality, please watch the ad until the
     end.</string>
   <string name="pick_color">pick</string>
+  <string name="no_internet">No Internet available. Sorry! :(</string>
 </resources>

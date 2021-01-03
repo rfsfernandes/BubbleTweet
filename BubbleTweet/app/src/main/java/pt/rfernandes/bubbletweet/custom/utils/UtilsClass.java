@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.view.View;

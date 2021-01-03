@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">BubbleTweet</string>
   <string name="add_widget">Adicionar widget</string>
   <string name="empty_tweet">Não é possível enviar um tweet vazio.</string>
   <string name="write_your_tweet">Escreva o seu tweet</string>
@@ -30,4 +29,5 @@
   <string name="watch_ad_please">Para utilizar esta funcionalidade, por favor assista ao anúncio
     até ao fim.</string>
   <string name="pick_color">escolher</string>
+  <string name="no_internet">Sem internet. Desculpa! :(</string>
 </resources>

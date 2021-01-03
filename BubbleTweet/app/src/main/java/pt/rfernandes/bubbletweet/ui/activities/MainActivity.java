@@ -1,7 +1,6 @@
 package pt.rfernandes.bubbletweet.ui.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -18,11 +17,15 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorChangedListener;
-import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-import com.flask.colorpicker.slider.AlphaSlider;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.AuthCredential;
@@ -36,6 +39,8 @@ import com.twitter.sdk.android.core.TwitterConfig;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+
+import java.util.Arrays;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -53,6 +58,7 @@ import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.viewmodels.MainActivityViewModel;
 import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
 
+import static pt.rfernandes.bubbletweet.custom.utils.UtilsClass.md5;
 import static pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity.FROM_MAIN_LOGIN;
 
 public class MainActivity extends AppCompatActivity {
@@ -74,11 +80,13 @@ public class MainActivity extends AppCompatActivity {
   private AlertDialog colorPickerCustomDialog;
   private CardView cardViewPickColor;
   private SwitchMaterial switchMaterial;
+  private AdView mAdView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(UtilsClass.getInstance().setStatusBarDark(this));
     super.onCreate(savedInstanceState);
+
 
     mMainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
     if (Constants.sTweetCreds != null) {
@@ -91,18 +99,19 @@ public class MainActivity extends AppCompatActivity {
       Twitter.initialize(twitterConfig);
     }
     setContentView(R.layout.activity_main);
+    mAdView = findViewById(R.id.adView);
+    handleBannerGoodie();
     context = this;
     createColorPickerDialog();
     initViewModel();
     mMainActivityViewModel.getLoggedInUser();
-
 
     mFirebaseAuth = FirebaseAuth.getInstance();
     cardViewPickColor = findViewById(R.id.cardViewPickColor);
     imageView = findViewById(R.id.imageView);
     textViewDisplayName = findViewById(R.id.textViewDisplayName);
     textViewUsername = findViewById(R.id.textViewUsername);
-    mTwitterBtn = findViewById(R.id.createBtn);
+    mTwitterBtn = findViewById(R.id.twitterBtn);
     buttonActivateService = findViewById(R.id.buttonActivateService);
     linearLayoutUserInfo = findViewById(R.id.linearLayoutUserInfo);
     buttonLogout = findViewById(R.id.buttonLogout);
@@ -246,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
     progressBar.getIndeterminateDrawable().setTint(color);
     imageView.setBorderColor(color);
     buttonActivateService.getBackground().setTint(color);
+    mTwitterBtn.getBackground().setTint(color);
     if(color == R.color.colorAccent) {
       cardViewPickColor.setCardBackgroundColor(getColor(R.color.colorAccent));
     } else {
@@ -358,6 +368,58 @@ public class MainActivity extends AppCompatActivity {
   // Shows message to the user...
   void showMessage(String message) {
     Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+  }
+
+  private void handleBannerGoodie(){
+
+    if (Constants.APP_DEBUG) {
+      String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+      String deviceId = md5(android_id).toUpperCase();
+      RequestConfiguration configuration =
+          new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList(deviceId)).build();
+      MobileAds.setRequestConfiguration(configuration);
+    }
+
+    MobileAds.initialize(this, new OnInitializationCompleteListener() {
+      @Override
+      public void onInitializationComplete(InitializationStatus initializationStatus) {
+      }
+    });
+
+    AdRequest adRequest = new AdRequest.Builder().build();
+    mAdView.loadAd(adRequest);
+
+    mAdView.setAdListener(new AdListener() {
+      @Override
+      public void onAdLoaded() {
+        // Code to be executed when an ad finishes loading.
+      }
+
+      @Override
+      public void onAdFailedToLoad(LoadAdError adError) {
+        // Code to be executed when an ad request fails.
+        mAdView.setVisibility(View.INVISIBLE);
+
+      }
+
+      @Override
+      public void onAdOpened() {
+        // Code to be executed when an ad opens an overlay that
+        // covers the screen.
+      }
+
+      @Override
+      public void onAdClicked() {
+        // Code to be executed when the user clicks on an ad.
+      }
+
+      @Override
+      public void onAdClosed() {
+        // Code to be executed when the user is about to return
+        // to the app after tapping on an ad.
+      }
+    });
+
   }
 
 }
