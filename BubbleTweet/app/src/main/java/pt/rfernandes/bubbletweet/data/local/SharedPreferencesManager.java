@@ -5,14 +5,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.firebase.auth.FirebaseUser;
-import com.google.gson.Gson;
-import com.twitter.sdk.android.core.TwitterSession;
-
 import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.model.CustomUser;
 
-import static pt.rfernandes.bubbletweet.custom.Constants.TWEET_SPAN_TILL_AD;
+import static pt.rfernandes.bubbletweet.custom.utils.Constants.TWEET_SPAN_TILL_AD;
 
 public class SharedPreferencesManager {
   private static final String SHARED_PREFS = "SHARED_PREFS";

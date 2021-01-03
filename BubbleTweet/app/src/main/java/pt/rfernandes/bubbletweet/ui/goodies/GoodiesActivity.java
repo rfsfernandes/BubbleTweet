@@ -25,11 +25,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import androidx.work.WorkInfo;
 import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.utils.Constants;
 import pt.rfernandes.bubbletweet.custom.service.FloatingService;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 

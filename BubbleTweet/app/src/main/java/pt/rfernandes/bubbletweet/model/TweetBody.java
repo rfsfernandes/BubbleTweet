@@ -1,14 +1,9 @@
 package pt.rfernandes.bubbletweet.model;
 
-import android.content.Context;
-
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.Random;
-import java.util.UUID;
 
-import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 
 public class TweetBody {

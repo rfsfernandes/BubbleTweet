@@ -32,7 +32,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.Nullable;
 import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.utils.Constants;
 import pt.rfernandes.bubbletweet.custom.MyApp;
 import pt.rfernandes.bubbletweet.custom.utils.CheckInternet;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
@@ -43,8 +43,8 @@ import pt.rfernandes.bubbletweet.model.TweetBody;
 import pt.rfernandes.bubbletweet.ui.activities.MainActivity;
 import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
 
-import static pt.rfernandes.bubbletweet.custom.Constants.MAX_LENGTH_MENTION;
-import static pt.rfernandes.bubbletweet.custom.Constants.MAX_LENGTH_NO_MENTION;
+import static pt.rfernandes.bubbletweet.custom.utils.Constants.MAX_LENGTH_MENTION;
+import static pt.rfernandes.bubbletweet.custom.utils.Constants.MAX_LENGTH_NO_MENTION;
 
 public class FloatingService extends Service implements
     View.OnTouchListener {

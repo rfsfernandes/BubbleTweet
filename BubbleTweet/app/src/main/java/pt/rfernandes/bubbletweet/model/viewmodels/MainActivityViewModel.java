@@ -3,23 +3,11 @@ package pt.rfernandes.bubbletweet.model.viewmodels;
 import android.app.Application;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.twitter.sdk.android.core.TwitterSession;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import pt.rfernandes.bubbletweet.custom.Constants;
 import pt.rfernandes.bubbletweet.data.Repository;
 import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;

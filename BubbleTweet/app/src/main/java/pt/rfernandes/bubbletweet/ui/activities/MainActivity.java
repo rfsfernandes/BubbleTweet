@@ -19,11 +19,9 @@ import com.bumptech.glide.Glide;
 import com.flask.colorpicker.ColorPickerView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -40,8 +38,6 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
-import java.util.Arrays;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,7 +46,7 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
 import de.hdodenhof.circleimageview.CircleImageView;
 import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.utils.Constants;
 import pt.rfernandes.bubbletweet.custom.service.FloatingService;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
@@ -58,7 +54,6 @@ import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.viewmodels.MainActivityViewModel;
 import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
 
-import static pt.rfernandes.bubbletweet.custom.utils.UtilsClass.md5;
 import static pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity.FROM_MAIN_LOGIN;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package pt.rfernandes.bubbletweet.custom;
+package pt.rfernandes.bubbletweet.custom.utils;
 
 import pt.rfernandes.bubbletweet.model.TweetCreds;
 

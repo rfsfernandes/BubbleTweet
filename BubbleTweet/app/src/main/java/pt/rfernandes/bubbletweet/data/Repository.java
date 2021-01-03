@@ -3,7 +3,6 @@ package pt.rfernandes.bubbletweet.data;
 import android.app.Activity;
 import android.app.Application;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -11,8 +10,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.utils.Constants;
 import pt.rfernandes.bubbletweet.data.local.AppDatabase;
 import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.data.remote.DataSource;
