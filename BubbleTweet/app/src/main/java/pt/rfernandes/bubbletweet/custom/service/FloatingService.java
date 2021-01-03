@@ -2,13 +2,10 @@ package pt.rfernandes.bubbletweet.custom.service;
 
 import android.app.AlertDialog;
 import android.app.Service;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.VibrationEffect;
@@ -36,14 +33,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import androidx.annotation.Nullable;
 import pt.rfernandes.bubbletweet.R;
 import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.MyApp;
+import pt.rfernandes.bubbletweet.custom.utils.CheckInternet;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
 import pt.rfernandes.bubbletweet.data.Repository;
-import pt.rfernandes.bubbletweet.data.local.DBCallBack;
 import pt.rfernandes.bubbletweet.data.local.SharedPreferencesManager;
 import pt.rfernandes.bubbletweet.data.remote.RequestCallBack;
-import pt.rfernandes.bubbletweet.model.CustomUser;
 import pt.rfernandes.bubbletweet.model.TweetBody;
-import pt.rfernandes.bubbletweet.model.TweetCreds;
 import pt.rfernandes.bubbletweet.ui.activities.MainActivity;
 import pt.rfernandes.bubbletweet.ui.goodies.GoodiesActivity;
 
@@ -90,6 +86,8 @@ public class FloatingService extends Service implements
   private TextInputLayout textInputLayoutRight;
   private int maxTweetLength = 0;
   private Vibrator myVib;
+  private MyApp mMyApp;
+  private boolean isNetwork;
 
   @Nullable
   @Override
@@ -100,6 +98,12 @@ public class FloatingService extends Service implements
   @Override
   public void onCreate() {
     super.onCreate();
+    mMyApp = (MyApp) getApplication();
+
+    new CheckInternet(internet -> isNetwork = internet);
+
+    mMyApp.networkChangedCallBack(isAvailable -> isNetwork = isAvailable);
+
     mRepository = Repository.getInstance(getApplication());
     Display display = getDisplay();
     Point size = new Point();
@@ -140,7 +144,7 @@ public class FloatingService extends Service implements
     textInputLayoutRight.setCounterMaxLength(maxTweetLength);
 
     mRepository.getUserLoggedIn(user -> {
-      if(user != null) {
+      if (user != null) {
         textViewUserAtLeft.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
         textViewUserAtRight.setText(String.format("%s @%s", getString(R.string.as_at), user.getUsername()));
       }
@@ -188,12 +192,12 @@ public class FloatingService extends Service implements
     return params;
   }
 
-  private void tintViews(int color){
-    int[][] states = new int[][] {
-        new int[] { android.R.attr.state_enabled},
+  private void tintViews(int color) {
+    int[][] states = new int[][]{
+        new int[]{android.R.attr.state_enabled},
     };
 
-    int[] colors = new int[] {
+    int[] colors = new int[]{
         color
     };
 
@@ -220,7 +224,7 @@ public class FloatingService extends Service implements
   private final TextView.OnEditorActionListener mOnEditorActionListener = new TextView.OnEditorActionListener() {
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-      if(actionId == EditorInfo.IME_ACTION_SEND) {
+      if (actionId == EditorInfo.IME_ACTION_SEND) {
         sendTweetClick.onClick(v);
         return true;
       }
@@ -233,40 +237,43 @@ public class FloatingService extends Service implements
   private final View.OnClickListener sendTweetClick = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      String tweetContent = "";
-      switch (mSIDE) {
-        case LEFT:
-          tweetContent = editTextTextLeft.getText().toString();
-          break;
-        case RIGHT:
-          tweetContent = editTextTextRight.getText().toString();
-          break;
-      }
+      if (isNetwork) {
+        String tweetContent = "";
+        switch (mSIDE) {
+          case LEFT:
+            tweetContent = editTextTextLeft.getText().toString();
+            break;
+          case RIGHT:
+            tweetContent = editTextTextRight.getText().toString();
+            break;
+        }
 
-      if (tweetContent.isEmpty()) {
+        if (tweetContent.isEmpty()) {
 
-        showMessage(getString(R.string.empty_tweet));
+          showMessage(getString(R.string.empty_tweet));
 
-      } else {
-        if (Constants.ADS_DEBUGGER) {
-          startAds();
         } else {
-          if (tweetContent.length() > maxTweetLength) {
-            showMessage(getString(R.string.tweet_too_big, maxTweetLength));
-            disableKeyboard();
+          if (Constants.ADS_DEBUGGER) {
+            startAds();
           } else {
-            if (SharedPreferencesManager.getInstance(getApplication()).getAvailableTokens() == 0) {
-              startAds();
+            if (tweetContent.length() > maxTweetLength) {
+              showMessage(getString(R.string.tweet_too_big, maxTweetLength));
+              disableKeyboard();
             } else {
-              if (showEnding) {
-                tweetContent =
-                    tweetContent + getResources().getString(R.string.tweet_sent_from_bubble);
+              if (SharedPreferencesManager.getInstance(getApplication()).getAvailableTokens() == 0) {
+                startAds();
+              } else {
+                if (showEnding) {
+                  tweetContent =
+                      tweetContent + getResources().getString(R.string.tweet_sent_from_bubble);
+                }
+                sendTweet(tweetContent);
               }
-              sendTweet(tweetContent);
             }
           }
         }
-
+      } else {
+        Toast.makeText(mMyApp, getString(R.string.no_internet), Toast.LENGTH_LONG).show();
       }
     }
   };
@@ -375,7 +382,7 @@ public class FloatingService extends Service implements
     UtilsClass.getInstance().openKeyboard(getApplication(), mFloatingView, false);
     editTextTextRight.setText("");
     editTextTextLeft.setText("");
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
   }
 

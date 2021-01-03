@@ -82,7 +82,7 @@ public class GoodiesActivity extends AppCompatActivity {
             public void onRewardedAdClosed() {
               // Ad closed.
               Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.sorry_ads),
-                  Toast.LENGTH_SHORT).show();
+                  Toast.LENGTH_LONG).show();
               resumeService(true, true);
             }
 
@@ -92,13 +92,13 @@ public class GoodiesActivity extends AppCompatActivity {
               // User earned reward.
               SharedPreferencesManager.getInstance(getApplication()).setTokenKey(reward.getAmount());
               Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.thank_you_ad),
-                  Toast.LENGTH_SHORT).show();
+                  Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onRewardedAdFailedToShow(AdError adError) {
               // Ad failed to display.
-              Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.no_ads_to_show), Toast.LENGTH_SHORT).show();
+              Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.no_ads_to_show), Toast.LENGTH_LONG).show();
               resumeService(false, true);
             }
           };
@@ -109,7 +109,7 @@ public class GoodiesActivity extends AppCompatActivity {
       @Override
       public void onRewardedAdFailedToLoad(LoadAdError adError) {
         // Ad failed to load.
-        Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.no_ads_to_show), Toast.LENGTH_SHORT).show();
+        Toast.makeText(GoodiesActivity.this, getResources().getString(R.string.no_ads_to_show), Toast.LENGTH_LONG).show();
         resumeService(false, false);
       }
     };

@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     setTheme(UtilsClass.getInstance().setStatusBarDark(this));
     super.onCreate(savedInstanceState);
 
-
     mMainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
     if (Constants.sTweetCreds != null) {
       TwitterAuthConfig mTwitterAuthConfig = new TwitterAuthConfig(Constants.sTweetCreds.getTweetConsumerKey(),
