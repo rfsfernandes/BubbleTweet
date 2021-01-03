@@ -53,7 +53,7 @@ import static pt.rfernandes.bubbletweet.custom.Constants.MAX_LENGTH_NO_MENTION;
 public class FloatingService extends Service implements
     View.OnTouchListener {
 
-  private final static float CLICK_DRAG_TOLERANCE = 25; // Often, there will be a slight,
+  private final static float CLICK_DRAG_TOLERANCE = 35; // Often, there will be a slight,
   // unintentional, drag when the user taps the FAB, so we need to account for this.
   private float downRawX, downRawY;
 

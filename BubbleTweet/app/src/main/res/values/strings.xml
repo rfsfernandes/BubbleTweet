@@ -32,7 +32,8 @@
   <string name="please_consider_enabling_it_thank_you">Please consider enabling it. Thank you.</string>
   <string name="enabling_this_feature_will_help_bubbletweet_reach_more_people_it_would_help_us_a_lot">Enabling this feature will help BubbleTweet reach more people. It would help us a lot!</string>
   <string name="mention_bubbletweet_in_the_end_of_my_tweets">Mention BubbleTweet in the end of my tweets</string>
-  <string name="tweet_sent_from_bubble" translatable="false">&#160;-&#160;Tweet sent from BubbleTweet</string>
+  <string name="tweet_sent_from_bubble" translatable="false">\n&#160;-&#160;Tweet sent from
+    BubbleT</string>
   <string name="get_twitter">get twitter</string>
   <string name="login_failed_no_app">Login failed. Looks like you don\'t have twitter installed.</string>
   <string name="yes">Yes</string>

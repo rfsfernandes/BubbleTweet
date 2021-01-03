@@ -11,7 +11,7 @@ public class Constants {
   public static final String FROM_WIDGET = "FROM_WIDGET";
   public static final String FROM_DEFS = "FROM_DEFS";
   public static final int TWEET_SPAN_TILL_AD = 3;
-  public static final int MAX_LENGTH_MENTION = 250;
+  public static final int MAX_LENGTH_MENTION = 253;
   public static final int MAX_LENGTH_NO_MENTION = 280;
   public static TweetCreds sTweetCreds;
 
