@@ -2,7 +2,6 @@ package pt.rfernandes.bubbletweet.ui.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import androidx.appcompat.app.AppCompatActivity;
 import pt.rfernandes.bubbletweet.R;
-import pt.rfernandes.bubbletweet.custom.CallBackNetwork;
-import pt.rfernandes.bubbletweet.custom.Constants;
+import pt.rfernandes.bubbletweet.custom.utils.Constants;
 import pt.rfernandes.bubbletweet.custom.MyApp;
 import pt.rfernandes.bubbletweet.custom.utils.CheckInternet;
 import pt.rfernandes.bubbletweet.custom.utils.UtilsClass;
