@@ -372,14 +372,6 @@ public class MainActivity extends AppCompatActivity {
 
   private void handleBannerGoodie(){
 
-    if (Constants.APP_DEBUG) {
-      String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-      String deviceId = md5(android_id).toUpperCase();
-      RequestConfiguration configuration =
-          new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList(deviceId)).build();
-      MobileAds.setRequestConfiguration(configuration);
-    }
-
     MobileAds.initialize(this, new OnInitializationCompleteListener() {
       @Override
       public void onInitializationComplete(InitializationStatus initializationStatus) {
